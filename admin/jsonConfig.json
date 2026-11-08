@@ -1,0 +1,292 @@
+{
+    "i18n": true,
+    "type": "tabs",
+    "items": {
+        "_demos": {
+            "type": "panel",
+            "label": "Demos",
+            "items": {
+                "_demosHint": {
+                    "type": "staticText",
+                    "text": "demos_hint",
+                    "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
+                },
+                "demos": {
+                    "type": "accordion",
+                    "titleAttr": "title",
+                    "clone": true,
+                    "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12,
+                    "items": [
+                        {
+                            "type": "checkbox",
+                            "attr": "enabled",
+                            "label": "Show on the page",
+                            "default": true,
+                            "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
+                        },
+                        {
+                            "type": "selectSendTo",
+                            "attr": "type",
+                            "label": "Visualization",
+                            "command": "getVisualizations",
+                            "noTranslation": true,
+                            "newLine": true,
+                            "xs": 12, "sm": 12, "md": 4, "lg": 4, "xl": 4
+                        },
+                        {
+                            "type": "selectSendTo",
+                            "attr": "project",
+                            "label": "Project",
+                            "command": "getProjects",
+                            "jsonData": "{\"type\":\"${data.type}\"}",
+                            "alsoDependsOn": ["type"],
+                            "noTranslation": true,
+                            "hidden": "!data.type || !['vis-2','vis','aura','iqontrol','jarvis','lovelace','echarts','flot'].includes(data.type)",
+                            "xs": 12, "sm": 12, "md": 4, "lg": 4, "xl": 4
+                        },
+                        {
+                            "type": "selectSendTo",
+                            "attr": "view",
+                            "label": "View (optional)",
+                            "command": "getViews",
+                            "jsonData": "{\"type\":\"${data.type}\",\"project\":\"${data.project}\"}",
+                            "alsoDependsOn": ["type", "project"],
+                            "noTranslation": true,
+                            "hidden": "!data.project || !['vis-2','vis','aura','iqontrol','jarvis'].includes(data.type)",
+                            "xs": 12, "sm": 12, "md": 4, "lg": 4, "xl": 4
+                        },
+                        {
+                            "type": "text",
+                            "attr": "customUrl",
+                            "label": "Address",
+                            "help": "custom_url_help",
+                            "hidden": "data.type !== 'custom'",
+                            "xs": 12, "sm": 12, "md": 8, "lg": 8, "xl": 8
+                        },
+                        {
+                            "type": "text",
+                            "attr": "title",
+                            "label": "Title",
+                            "default": "Demo",
+                            "newLine": true,
+                            "xs": 12, "sm": 12, "md": 6, "lg": 4, "xl": 4
+                        },
+                        {
+                            "type": "text",
+                            "attr": "titleEn",
+                            "label": "Title (English)",
+                            "xs": 12, "sm": 12, "md": 6, "lg": 4, "xl": 4
+                        },
+                        {
+                            "type": "text",
+                            "attr": "tab",
+                            "label": "Short name in the live view",
+                            "help": "tab_help",
+                            "xs": 12, "sm": 12, "md": 6, "lg": 2, "xl": 2
+                        },
+                        {
+                            "type": "text",
+                            "attr": "tabEn",
+                            "label": "Short name (English)",
+                            "xs": 12, "sm": 12, "md": 6, "lg": 2, "xl": 2
+                        },
+                        {
+                            "type": "text",
+                            "attr": "desc",
+                            "label": "Description",
+                            "minRows": 2,
+                            "maxRows": 4,
+                            "newLine": true,
+                            "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
+                        },
+                        {
+                            "type": "text",
+                            "attr": "descEn",
+                            "label": "Description (English)",
+                            "minRows": 2,
+                            "maxRows": 4,
+                            "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
+                        },
+                        {
+                            "type": "text",
+                            "attr": "section",
+                            "label": "Section on the page",
+                            "help": "section_help",
+                            "newLine": true,
+                            "xs": 12, "sm": 12, "md": 6, "lg": 3, "xl": 3
+                        },
+                        {
+                            "type": "text",
+                            "attr": "sectionEn",
+                            "label": "Section (English)",
+                            "xs": 12, "sm": 12, "md": 6, "lg": 3, "xl": 3
+                        },
+                        {
+                            "type": "chips",
+                            "attr": "tags",
+                            "label": "Used adapters",
+                            "xs": 12, "sm": 12, "md": 12, "lg": 6, "xl": 6
+                        },
+                        {
+                            "type": "file",
+                            "attr": "image",
+                            "label": "Screenshot",
+                            "help": "image_help",
+                            "limitPath": "demo-page.0",
+                            "filterFiles": ["png", "jpg", "jpeg", "webp", "svg"],
+                            "allowUpload": true,
+                            "newLine": true,
+                            "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
+                        },
+                        {
+                            "type": "file",
+                            "attr": "downloadUrl",
+                            "label": "Template to download",
+                            "help": "download_help",
+                            "limitPath": "demo-page.0",
+                            "allowUpload": true,
+                            "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "downloadSoon",
+                            "label": "Template comes later",
+                            "hidden": "!!data.downloadUrl",
+                            "newLine": true,
+                            "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "newTab",
+                            "label": "Open in a new tab",
+                            "help": "new_tab_help",
+                            "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
+                        }
+                    ]
+                }
+            }
+        },
+        "_page": {
+            "type": "panel",
+            "label": "Page sections",
+            "items": {
+                "_general": { "type": "header", "text": "General", "size": 4, "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "brandName": { "type": "text", "label": "Name", "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "brandSuffix": { "type": "text", "label": "Highlighted ending of the name", "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "defaultLanguage": {
+                    "type": "select",
+                    "label": "Language",
+                    "options": [
+                        { "label": "Language of the browser", "value": "" },
+                        { "label": "German", "value": "de" },
+                        { "label": "English", "value": "en" }
+                    ],
+                    "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3
+                },
+                "languageSwitch": { "type": "checkbox", "label": "Show language switch", "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+
+                "_hero": { "type": "header", "text": "Intro", "size": 4, "newLine": true, "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "heroEnabled": { "type": "checkbox", "label": "Show this section", "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "heroKicker": { "type": "text", "label": "Small line above the title", "hidden": "!data.heroEnabled", "newLine": true, "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "heroKickerEn": { "type": "text", "label": "Small line (English)", "hidden": "!data.heroEnabled", "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "heroTitle": { "type": "text", "label": "Title", "hidden": "!data.heroEnabled", "newLine": true, "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "heroTitleEn": { "type": "text", "label": "Title (English)", "hidden": "!data.heroEnabled", "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "heroText": { "type": "text", "label": "Text", "minRows": 2, "maxRows": 5, "hidden": "!data.heroEnabled", "newLine": true, "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "heroTextEn": { "type": "text", "label": "Text (English)", "minRows": 2, "maxRows": 5, "hidden": "!data.heroEnabled", "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "heroImage": {
+                    "type": "file",
+                    "label": "Image",
+                    "limitPath": "demo-page.0",
+                    "filterFiles": ["png", "jpg", "jpeg", "webp", "svg"],
+                    "allowUpload": true,
+                    "hidden": "!data.heroEnabled",
+                    "newLine": true,
+                    "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
+                },
+
+                "_highlights": { "type": "header", "text": "Highlights", "size": 4, "newLine": true, "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "highlightsEnabled": { "type": "checkbox", "label": "Show this section", "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "highlights": {
+                    "type": "table",
+                    "hidden": "!data.highlightsEnabled",
+                    "newLine": true,
+                    "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12,
+                    "items": [
+                        { "type": "text", "attr": "title", "title": "Title", "width": "20%" },
+                        { "type": "text", "attr": "titleEn", "title": "Title (English)", "width": "20%" },
+                        { "type": "text", "attr": "text", "title": "Text", "width": "30%" },
+                        { "type": "text", "attr": "textEn", "title": "Text (English)", "width": "30%" }
+                    ]
+                },
+
+                "_howto": { "type": "header", "text": "How it works", "size": 4, "newLine": true, "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "howtoEnabled": { "type": "checkbox", "label": "Show this section", "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "howtoTitle": { "type": "text", "label": "Title", "hidden": "!data.howtoEnabled", "newLine": true, "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "howtoTitleEn": { "type": "text", "label": "Title (English)", "hidden": "!data.howtoEnabled", "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "howtoNav": { "type": "text", "label": "Name in the menu", "hidden": "!data.howtoEnabled", "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "howtoNavEn": { "type": "text", "label": "Name in the menu (English)", "hidden": "!data.howtoEnabled", "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "howtoSteps": {
+                    "type": "table",
+                    "hidden": "!data.howtoEnabled",
+                    "newLine": true,
+                    "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12,
+                    "items": [
+                        { "type": "text", "attr": "title", "title": "Title", "width": "15%" },
+                        { "type": "text", "attr": "titleEn", "title": "Title (English)", "width": "15%" },
+                        { "type": "text", "attr": "text", "title": "Text", "width": "25%" },
+                        { "type": "text", "attr": "textEn", "title": "Text (English)", "width": "25%" },
+                        { "type": "file", "attr": "image", "title": "Picture", "width": "20%", "limitPath": "demo-page.0", "allowUpload": true, "filterFiles": ["jpg", "jpeg", "png", "webp", "svg"], "tooltip": "With a picture for every step (2 to 4 steps) the section walks through the steps while scrolling" }
+                    ]
+                },
+
+                "_install": { "type": "header", "text": "Installation note", "size": 4, "newLine": true, "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "installEnabled": { "type": "checkbox", "label": "Show this section", "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "installTitle": { "type": "text", "label": "Title", "hidden": "!data.installEnabled", "newLine": true, "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "installTitleEn": { "type": "text", "label": "Title (English)", "hidden": "!data.installEnabled", "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "installText": { "type": "text", "label": "Text", "hidden": "!data.installEnabled", "newLine": true, "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "installTextEn": { "type": "text", "label": "Text (English)", "hidden": "!data.installEnabled", "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "installButton": { "type": "text", "label": "Button", "hidden": "!data.installEnabled", "newLine": true, "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "installButtonEn": { "type": "text", "label": "Button (English)", "hidden": "!data.installEnabled", "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "installUrl": { "type": "text", "label": "Address", "hidden": "!data.installEnabled", "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6 }
+            }
+        },
+        "_live": {
+            "type": "panel",
+            "label": "Live view and links",
+            "items": {
+                "_notice": { "type": "header", "text": "Live view", "size": 4, "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "notice": { "type": "text", "label": "Note for visitors", "help": "notice_help", "minRows": 2, "maxRows": 4, "newLine": true, "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "noticeEn": { "type": "text", "label": "Note (English)", "minRows": 2, "maxRows": 4, "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "guideLabel": { "type": "text", "label": "Link to a guide: text", "newLine": true, "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "guideLabelEn": { "type": "text", "label": "Text (English)", "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "guideUrl": { "type": "text", "label": "Address", "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6 },
+
+                "_navLinks": { "type": "header", "text": "Links in the menu", "size": 4, "newLine": true, "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "navLinks": {
+                    "type": "table",
+                    "newLine": true,
+                    "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12,
+                    "items": [
+                        { "type": "text", "attr": "label", "title": "Text", "width": "30%" },
+                        { "type": "text", "attr": "labelEn", "title": "Text (English)", "width": "30%" },
+                        { "type": "text", "attr": "url", "title": "Address", "width": "40%" }
+                    ]
+                },
+
+                "_footer": { "type": "header", "text": "Footer", "size": 4, "newLine": true, "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12 },
+                "footerText": { "type": "text", "label": "Text", "newLine": true, "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "footerTextEn": { "type": "text", "label": "Text (English)", "xs": 12, "sm": 6, "md": 6, "lg": 6, "xl": 6 },
+                "footerLinks": {
+                    "type": "table",
+                    "newLine": true,
+                    "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12,
+                    "items": [
+                        { "type": "text", "attr": "label", "title": "Text", "width": "30%" },
+                        { "type": "text", "attr": "labelEn", "title": "Text (English)", "width": "30%" },
+                        { "type": "text", "attr": "url", "title": "Address", "width": "40%" }
+                    ]
+                }
+            }
+        }
+    }
+}

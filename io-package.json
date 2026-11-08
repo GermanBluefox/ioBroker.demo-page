@@ -1,0 +1,242 @@
+{
+    "common": {
+        "name": "demo-page",
+        "version": "0.1.1",
+        "news": {
+            "0.1.1": {
+                "en": "A chosen view can be removed again",
+                "de": "Eine gewählte Ansicht lässt sich wieder entfernen",
+                "ru": "Выбранное представление можно снова убрать",
+                "pt": "Uma vista escolhida pode ser removida novamente",
+                "nl": "Een gekozen weergave kan weer worden verwijderd",
+                "fr": "Une vue choisie peut de nouveau être retirée",
+                "it": "Una vista scelta può essere nuovamente rimossa",
+                "es": "Una vista elegida se puede volver a quitar",
+                "pl": "Wybrany widok można ponownie usunąć",
+                "uk": "Вибране подання можна знову прибрати",
+                "zh-cn": "已选择的视图可以再次移除"
+            },
+            "0.1.0": {
+                "en": "Initial release",
+                "de": "Erste Version",
+                "ru": "Первый выпуск",
+                "pt": "Versão inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Version initiale",
+                "it": "Prima versione",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "uk": "Перший випуск",
+                "zh-cn": "首次发布"
+            }
+        },
+        "titleLang": {
+            "en": "Demo page",
+            "de": "Demo-Seite",
+            "ru": "Демо-страница",
+            "pt": "Página de demonstração",
+            "nl": "Demopagina",
+            "fr": "Page de démonstration",
+            "it": "Pagina demo",
+            "es": "Página de demostración",
+            "pl": "Strona demonstracyjna",
+            "uk": "Демо-сторінка",
+            "zh-cn": "演示页面"
+        },
+        "desc": {
+            "en": "Public start page that shows selected visualization projects",
+            "de": "Öffentliche Startseite, die ausgewählte Visualisierungsprojekte zeigt",
+            "ru": "Публичная стартовая страница с выбранными проектами визуализации",
+            "pt": "Página inicial pública com projetos de visualização selecionados",
+            "nl": "Openbare startpagina met geselecteerde visualisatieprojecten",
+            "fr": "Page d'accueil publique présentant des projets de visualisation choisis",
+            "it": "Pagina iniziale pubblica con progetti di visualizzazione selezionati",
+            "es": "Página de inicio pública con proyectos de visualización seleccionados",
+            "pl": "Publiczna strona startowa z wybranymi projektami wizualizacji",
+            "uk": "Публічна стартова сторінка з вибраними проєктами візуалізації",
+            "zh-cn": "展示所选可视化项目的公共起始页"
+        },
+        "authors": [
+            "bluefox <dogafox@gmail.com>"
+        ],
+        "keywords": [
+            "demo",
+            "visualization",
+            "landing page",
+            "start page"
+        ],
+        "licenseInformation": {
+            "type": "free",
+            "license": "MIT"
+        },
+        "platform": "Javascript/Node.js",
+        "icon": "demo-page.svg",
+        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.demo-page/main/admin/demo-page.svg",
+        "readme": "https://github.com/ioBroker/ioBroker.demo-page/blob/main/README.md",
+        "enabled": true,
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "visualization",
+        "compact": true,
+        "singleton": true,
+        "tier": 3,
+        "connectionType": "local",
+        "dataSource": "none",
+        "messagebox": true,
+        "eraseOnUpload": true,
+        "adminUI": {
+            "config": "json"
+        },
+        "localLinks": {
+            "_default": {
+                "link": "%web_protocol%://%ip%:%web_port%/demo-page/index.html",
+                "name": {
+                    "en": "Demo page",
+                    "de": "Demo-Seite"
+                },
+                "icon": "demo-page/logo.svg",
+                "color": "#1d90ca"
+            }
+        },
+        "welcomeScreen": [
+            {
+                "link": "demo-page/index.html",
+                "name": "Demo page",
+                "img": "demo-page/logo.svg",
+                "color": "#1d90ca",
+                "order": 0
+            }
+        ],
+        "dependencies": [
+            {
+                "js-controller": ">=6.0.11"
+            },
+            {
+                "web": ">=7.0.0"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=7.6.20"
+            }
+        ]
+    },
+    "native": {
+        "brandName": "iobroker",
+        "brandSuffix": ".click",
+        "defaultLanguage": "",
+        "languageSwitch": true,
+        "demos": [],
+        "heroEnabled": true,
+        "heroKicker": "// LIVE-DEMO",
+        "heroKickerEn": "// LIVE DEMO",
+        "heroTitle": "ioBroker live erleben, bevor Sie installieren",
+        "heroTitleEn": "Experience ioBroker live before you install it",
+        "heroText": "Hier läuft ein echtes ioBroker-System. Sehen Sie sich die Visualisierungen live an und finden Sie heraus, welche zu Ihrem Zuhause passt.",
+        "heroTextEn": "A real ioBroker system is running here. Explore the visualizations live and find out which one suits your home.",
+        "heroImage": "",
+        "highlightsEnabled": true,
+        "highlights": [
+            {
+                "title": "ECHTES SYSTEM",
+                "titleEn": "REAL SYSTEM",
+                "text": "Keine Bilder, sondern ein laufendes ioBroker mit Adaptern und Datenpunkten.",
+                "textEn": "Not just pictures, but a running ioBroker with adapters and data points."
+            },
+            {
+                "title": "VIELE VISUALISIERUNGEN",
+                "titleEn": "MANY VISUALIZATIONS",
+                "text": "Vergleichen Sie die Oberflächen direkt nebeneinander auf einem System.",
+                "textEn": "Compare the user interfaces side by side on one system."
+            },
+            {
+                "title": "ZUM MITNEHMEN",
+                "titleEn": "TAKE IT WITH YOU",
+                "text": "Wo eine Vorlage bereitsteht, können Sie die Ansicht für Ihr System herunterladen.",
+                "textEn": "Where a template is available, you can download the view for your system."
+            }
+        ],
+        "howtoEnabled": true,
+        "howtoTitle": "SO KOMMT DIE VORLAGE IN IHR SYSTEM",
+        "howtoTitleEn": "HOW THE TEMPLATE GETS INTO YOUR SYSTEM",
+        "howtoNav": "So funktioniert es",
+        "howtoNavEn": "How it works",
+        "howtoSteps": [
+            {
+                "title": "Live ansehen",
+                "titleEn": "Watch it live",
+                "text": "Öffnen Sie die Ansicht in der Live-Demo und prüfen Sie, ob sie zu Ihrem Zuhause passt.",
+                "textEn": "Open the view in the live demo and check whether it suits your home."
+            },
+            {
+                "title": "Herunterladen",
+                "titleEn": "Download",
+                "text": "Sie erhalten die View, den CSS-Block und die Liste der nötigen Adapter und Aliase.",
+                "textEn": "You get the view, the CSS block and the list of required adapters and aliases."
+            },
+            {
+                "title": "Importieren",
+                "titleEn": "Import",
+                "text": "Importieren Sie die View im vis-2 Editor und fügen Sie das CSS ein.",
+                "textEn": "Import the view in the vis-2 editor and paste the CSS."
+            },
+            {
+                "title": "Aliase zuordnen",
+                "titleEn": "Assign aliases",
+                "text": "Verknüpfen Sie die Aliase mit Ihren Geräten. Die Widgets bleiben unverändert.",
+                "textEn": "Link the aliases to your devices. The widgets stay unchanged."
+            }
+        ],
+        "installEnabled": true,
+        "installTitle": "Noch kein ioBroker?",
+        "installTitleEn": "No ioBroker yet?",
+        "installText": "Installieren Sie ioBroker auf einem Raspberry Pi, unter Linux, Windows oder in Docker. Die Anleitung finden Sie auf iobroker.com.",
+        "installTextEn": "Install ioBroker on a Raspberry Pi, on Linux, Windows or in Docker. You will find the guide on iobroker.com.",
+        "installButton": "INSTALLATION",
+        "installButtonEn": "INSTALLATION",
+        "installUrl": "https://www.iobroker.com/",
+        "notice": "",
+        "noticeEn": "",
+        "guideLabel": "ANLEITUNG AUF IOBROKER.COM",
+        "guideLabelEn": "GUIDE ON IOBROKER.COM",
+        "guideUrl": "https://www.iobroker.com/",
+        "navLinks": [
+            {
+                "label": "iobroker.com",
+                "labelEn": "",
+                "url": "https://www.iobroker.com/"
+            }
+        ],
+        "footerText": "© ioBroker GmbH · Demo-System",
+        "footerTextEn": "© ioBroker GmbH · Demo system",
+        "footerLinks": [
+            {
+                "label": "iobroker.com",
+                "labelEn": "",
+                "url": "https://www.iobroker.com/"
+            },
+            {
+                "label": "Forum",
+                "labelEn": "",
+                "url": "https://forum.iobroker.net/"
+            },
+            {
+                "label": "Impressum",
+                "labelEn": "Imprint",
+                "url": "https://www.iobroker.com/imprint"
+            }
+        ]
+    },
+    "instanceObjects": [
+        {
+            "_id": "",
+            "type": "meta",
+            "common": {
+                "name": "Page description and images of the demo page",
+                "type": "meta.user"
+            },
+            "native": {}
+        }
+    ],
+    "objects": []
+}

@@ -1,0 +1,48 @@
+{
+  "name": "iobroker.demo-page",
+  "version": "0.1.1",
+  "description": "Public start page for ioBroker that shows selected visualization projects (vis-2, Aura, Devices, iQontrol and more)",
+  "author": "bluefox <dogafox@gmail.com>",
+  "contributors": [],
+  "homepage": "https://github.com/ioBroker/ioBroker.demo-page",
+  "license": "MIT",
+  "keywords": [
+    "ioBroker",
+    "demo",
+    "visualization",
+    "landing page"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ioBroker/ioBroker.demo-page.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ioBroker/ioBroker.demo-page/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "main.js",
+  "files": [
+    "admin/",
+    "lib/",
+    "www/",
+    "!www/.taste-skill/",
+    "io-package.json",
+    "LICENSE",
+    "main.js"
+  ],
+  "scripts": {
+    "test": "node --test test/unit/page.test.js && mocha test/package.js --exit",
+    "fonts": "node scripts/copy-fonts.js"
+  },
+  "dependencies": {
+    "@iobroker/adapter-core": "^3.4.3"
+  },
+  "devDependencies": {
+    "@fontsource/audiowide": "^5.3.0",
+    "@fontsource/roboto": "^5.3.0",
+    "@iobroker/testing": "^6.3.1",
+    "mocha": "^12.0.3"
+  }
+}

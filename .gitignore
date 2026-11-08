@@ -1,0 +1,8 @@
+node_modules/
+*.log
+.idea/
+.vscode/
+tmp/
+.taste-skill/
+shots/
+*.tgz
