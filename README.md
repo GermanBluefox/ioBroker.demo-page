@@ -49,6 +49,10 @@ by web as `/aura/` and can be embedded.
 
 ## Changelog
 
+### 0.1.2 (2026-11-09)
+
+- (bluefox) The content area is wider, so the distance to the display edge is smaller, and the header follows the design: it stands above the hero and its links are underlined only on hover. Sections no longer fill a whole screen and a single demo card keeps its normal width.
+
 ### 0.1.1 (2026-11-08)
 
 - (bluefox) A chosen view can be removed again: the view list has an entry "(Standard)".

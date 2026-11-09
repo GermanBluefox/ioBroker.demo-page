@@ -1,6 +1,6 @@
 {
   "name": "iobroker.demo-page",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Public start page for ioBroker that shows selected visualization projects (vis-2, Aura, Devices, iQontrol and more)",
   "author": "bluefox <dogafox@gmail.com>",
   "contributors": [],

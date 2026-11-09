@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "demo-page",
-        "version": "0.1.1",
+        "version": "0.1.2",
         "news": {
+            "0.1.2": {
+                "en": "Layout follows the design: wider content, new header, tighter sections",
+                "de": "Layout wie im Entwurf: breiterer Inhalt, neue Kopfzeile, engere Abschnitte",
+                "ru": "Макет как в проекте: шире содержимое, новая шапка, плотнее разделы",
+                "pt": "Layout como no design: conteúdo mais largo, novo cabeçalho, secções mais compactas",
+                "nl": "Lay-out volgens het ontwerp: bredere inhoud, nieuwe koptekst, compactere secties",
+                "fr": "Mise en page conforme à la maquette : contenu plus large, nouvel en-tête, sections plus compactes",
+                "it": "Layout come nel design: contenuto più ampio, nuova intestazione, sezioni più compatte",
+                "es": "Diseño como en la maqueta: contenido más ancho, nuevo encabezado, secciones más compactas",
+                "pl": "Układ zgodny z projektem: szersza treść, nowy nagłówek, ciaśniejsze sekcje",
+                "uk": "Макет як у проєкті: ширший вміст, нова шапка, щільніші розділи",
+                "zh-cn": "布局与设计稿一致:内容更宽、新页眉、章节更紧凑"
+            },
             "0.1.1": {
                 "en": "A chosen view can be removed again",
                 "de": "Eine gewählte Ansicht lässt sich wieder entfernen",

@@ -258,16 +258,16 @@
         const firstDemo = firstLiveDemo();
         const links = [];
         if (firstDemo) {
-            links.push(h('a', { class: 'm-link', href: liveUrl(firstDemo), 'data-route': true }, t.navLive));
+            links.push(h('a', { class: 'm-link m-link--bare', href: liveUrl(firstDemo), 'data-route': true }, t.navLive));
         }
         for (const section of config.sections) {
-            links.push(h('a', { class: 'm-link', href: `#${section.id}` }, tr(section.nav) || tr(section.title)));
+            links.push(h('a', { class: 'm-link m-link--bare', href: `#${section.id}` }, tr(section.nav) || tr(section.title)));
         }
         if (config.howto) {
-            links.push(h('a', { class: 'm-link', href: '#howto' }, tr(config.howto.nav)));
+            links.push(h('a', { class: 'm-link m-link--bare', href: '#howto' }, tr(config.howto.nav)));
         }
         for (const link of config.navLinks) {
-            links.push(h('a', { class: 'm-link', href: link.url }, tr(link.label)));
+            links.push(h('a', { class: 'm-link m-link--bare', href: link.url }, tr(link.label)));
         }
         return h(
             'header',
