@@ -8,8 +8,15 @@
     const CONFIG_URL = '../demo-page.0/config.json';
     const LANG_KEY = 'demo-page.lang';
     const LANGUAGES = ['de', 'en'];
+    /** The anchor of the section with all demos */
+    const DEMOS_ID = 'vorlagen';
     /** How long the first paint waits for the availability check, so that the hero enters only once */
     const PROBE_WAIT_MS = 400;
+    /** How often the preview over a live view asks whether the view shows something, and how long at most */
+    const STAGE_POLL_MS = 250;
+    const STAGE_WAIT_MS = 30000;
+    /** The duration of the preview's fade in style.css */
+    const STAGE_FADE_MS = 200;
 
     const UI = {
         de: {
@@ -19,7 +26,7 @@
             home: 'Startseite',
             skip: 'Zum Inhalt springen',
             mainNav: 'Hauptnavigation',
-            viewNav: 'Ansichten der Demo',
+            viewNav: 'Visualisierungen',
             download: 'HERUNTERLADEN',
             soon: 'BALD',
             soonBadge: 'DEMNÄCHST',
@@ -28,7 +35,7 @@
             downloadSoon: 'VORLAGE DEMNÄCHST',
             fullscreen: 'VOLLBILD',
             openTab: 'IN NEUEM TAB ÖFFNEN',
-            thisView: 'DIESE ANSICHT',
+            thisView: 'DIESE VISUALISIERUNG',
             usedAdapters: 'Verwendete Adapter',
             notice: 'HINWEIS',
             unavailable: 'NICHT VERFÜGBAR',
@@ -38,6 +45,7 @@
             externalText: 'Diese Visualisierung läuft unter einer eigenen Adresse und kann nicht in diese Seite eingebettet werden.',
             views: count => (count === 1 ? '1 Ansicht' : `${count} Ansichten`),
             ready: count => `${count} davon als Download bereit`,
+            soonCount: count => `${count} demnächst`,
             noDemos: 'Es sind noch keine Demos eingerichtet.',
             loadError: 'Die Seite konnte nicht geladen werden. Bitte versuchen Sie es später noch einmal.',
             loading: 'Wird geladen …',
@@ -49,7 +57,7 @@
             home: 'Home',
             skip: 'Skip to content',
             mainNav: 'Main navigation',
-            viewNav: 'Demo views',
+            viewNav: 'Visualizations',
             download: 'DOWNLOAD',
             soon: 'SOON',
             soonBadge: 'COMING SOON',
@@ -58,7 +66,7 @@
             downloadSoon: 'TEMPLATE COMING SOON',
             fullscreen: 'FULL SCREEN',
             openTab: 'OPEN IN NEW TAB',
-            thisView: 'THIS VIEW',
+            thisView: 'THIS VISUALIZATION',
             usedAdapters: 'Adapters used',
             notice: 'NOTE',
             unavailable: 'NOT AVAILABLE',
@@ -68,6 +76,7 @@
             externalText: 'This visualization runs under its own address and cannot be embedded in this page.',
             views: count => (count === 1 ? '1 view' : `${count} views`),
             ready: count => `${count} of them ready to download`,
+            soonCount: count => `${count} coming soon`,
             noDemos: 'No demos have been set up yet.',
             loadError: 'The page could not be loaded. Please try again later.',
             loading: 'Loading …',
@@ -156,8 +165,9 @@
         return svg;
     }
 
-    function allDemos() {
-        return config.sections.flatMap(section => section.demos);
+    /** The demos that can be opened: a card marked as coming soon has no live view yet */
+    function liveDemos() {
+        return config.sections.flatMap(section => section.demos).filter(demo => !demo.soon);
     }
 
     function isSameOrigin(url) {
@@ -187,7 +197,7 @@
      */
     function checkAvailability() {
         return Promise.all(
-            allDemos().map(demo =>
+            liveDemos().map(demo =>
                 Promise.all(
                     (demo.live.probes || []).filter(isSameOrigin).map(target =>
                         fetch(target, { method: 'HEAD', cache: 'no-store', credentials: 'same-origin' })
@@ -251,7 +261,7 @@
     }
 
     function firstLiveDemo() {
-        return allDemos().find(demo => availability[demo.id] !== false) || allDemos()[0];
+        return liveDemos().find(demo => availability[demo.id] !== false) || liveDemos()[0];
     }
 
     function renderHeader(t) {
@@ -260,8 +270,8 @@
         if (firstDemo) {
             links.push(h('a', { class: 'm-link m-link--bare', href: liveUrl(firstDemo), 'data-route': true }, t.navLive));
         }
-        for (const section of config.sections) {
-            links.push(h('a', { class: 'm-link m-link--bare', href: `#${section.id}` }, tr(section.nav) || tr(section.title)));
+        if (config.sections.length) {
+            links.push(h('a', { class: 'm-link m-link--bare', href: `#${DEMOS_ID}` }, tr(config.demosTitle)));
         }
         if (config.howto) {
             links.push(h('a', { class: 'm-link m-link--bare', href: '#howto' }, tr(config.howto.nav)));
@@ -308,16 +318,16 @@
                             'div',
                             { class: 'hero-actions' },
                             firstDemo && h('a', { class: 'btn btn--primary', href: liveUrl(firstDemo), 'data-route': true }, t.openLive, icon('arrow')),
-                            config.sections[0] &&
-                                h('a', { class: 'btn btn--secondary', href: `#${config.sections[0].id}` }, tr(config.sections[0].title)),
+                            config.sections.length > 0 &&
+                                h('a', { class: 'btn btn--secondary', href: `#${DEMOS_ID}` }, tr(config.demosTitle).toLocaleUpperCase(lang)),
                         ),
                     ),
                     hero.image &&
                         h(
                             'div',
-                            { class: 'hero-media', 'data-enter-media': true },
-                            h('img', { src: hero.image, alt: tr(hero.title) }),
+                            { class: 'hero-media' },
                             firstDemo && h('span', { class: 'live-pill' }, h('span', { class: 'dot' }), t.live),
+                            h('div', { class: 'hero-shot', 'data-enter-media': true }, h('img', { src: hero.image, alt: tr(hero.title) })),
                         ),
                 ),
                 renderHighlights(),
@@ -344,7 +354,7 @@
     }
 
     function renderDemoCard(demo, t) {
-        const available = availability[demo.id] !== false;
+        const available = !demo.soon && availability[demo.id] !== false;
         const download = demo.download;
         return h(
             'article',
@@ -365,55 +375,72 @@
                           h('img', { src: 'logo.svg', alt: '' }),
                           demo.typeLabel,
                       ),
-                !available
-                    ? h('span', { class: 'badge' }, h('span', { class: 'dot off' }), t.unavailable)
-                    : download?.url
-                      ? h('span', { class: 'badge' }, t.downloadReady)
-                      : download?.soon
-                        ? h('span', { class: 'badge' }, t.soonBadge)
-                        : null,
+                demo.soon
+                    ? h('span', { class: 'badge' }, t.soonBadge)
+                    : !available
+                      ? h('span', { class: 'badge' }, h('span', { class: 'dot off' }), t.unavailable)
+                      : download?.url
+                        ? h('span', { class: 'badge' }, t.downloadReady)
+                        : download?.soon
+                          ? h('span', { class: 'badge' }, t.soonBadge)
+                          : null,
             ),
             h(
                 'div',
                 { class: 'demo-body' },
-                h('h3', null, tr(demo.title)),
+                h('h4', null, tr(demo.title)),
                 tr(demo.desc) && h('p', null, tr(demo.desc)),
                 demo.tags.length ? h('div', { class: 'tags' }, demo.tags.map(tag => h('span', { class: 'tag' }, tag))) : null,
             ),
             h(
                 'div',
                 { class: 'demo-actions' },
-                available
-                    ? h(
-                          'a',
-                          { class: 'btn btn-quiet', href: liveUrl(demo), 'data-route': true },
-                          h('span', { class: 'dot' }),
-                          t.live,
-                      )
-                    : h('span', { class: 'btn btn-muted' }, t.unavailable),
+                demo.soon
+                    ? h('span', { class: 'btn btn-muted' }, t.soon)
+                    : available
+                      ? h(
+                            'a',
+                            { class: 'btn btn-quiet', href: liveUrl(demo), 'data-route': true },
+                            h('span', { class: 'dot' }),
+                            t.live,
+                        )
+                      : h('span', { class: 'btn btn-muted' }, t.unavailable),
                 download?.url &&
                     h('a', { class: 'btn btn--primary', href: download.url, download: '' }, icon('download'), t.download),
-                !download?.url && download?.soon && h('span', { class: 'btn btn-muted' }, icon('download'), t.soon),
+                !demo.soon && !download?.url && download?.soon && h('span', { class: 'btn btn-muted' }, icon('download'), t.soon),
             ),
         );
     }
 
-    function renderSection(section, t) {
-        const ready = section.demos.filter(demo => demo.download?.url).length;
-        const summary = t.views(section.demos.length) + (ready ? `, ${t.ready(ready)}` : '');
+    /** One block per visualization. Its size says how many columns of the page it takes. */
+    function renderBlock(section, t) {
         return h(
             'section',
-            { id: section.id, class: 'section' },
+            { id: section.id, class: `demo-block demo-block--${Math.min(section.demos.length, 3)}` },
+            h('h3', { class: 'block-title' }, tr(section.title)),
+            h('div', { class: 'grid-demos' }, section.demos.map(demo => renderDemoCard(demo, t))),
+        );
+    }
+
+    function renderDemos(t) {
+        const demos = config.sections.flatMap(section => section.demos);
+        const soon = demos.filter(demo => demo.soon).length;
+        const ready = demos.filter(demo => demo.download?.url).length;
+        const live = demos.length - soon;
+        const summary = [live && t.views(live), ready && t.ready(ready), soon && t.soonCount(soon)].filter(Boolean).join(', ');
+        return h(
+            'section',
+            { id: DEMOS_ID, class: 'section' },
             h(
                 'div',
                 { class: 'wrap' },
                 h(
                     'div',
                     { class: 'section-head' },
-                    h('h2', null, `// ${tr(section.title)}`),
+                    h('h2', null, `// ${tr(config.demosTitle).toLocaleUpperCase(lang)}`),
                     h('p', null, summary),
                 ),
-                h('div', { class: 'grid-demos' }, section.demos.map(demo => renderDemoCard(demo, t))),
+                h('div', { class: 'demo-blocks' }, config.sections.map(section => renderBlock(section, t))),
             ),
         );
     }
@@ -537,7 +564,7 @@
                 { id: 'main', tabindex: '-1' },
                 renderHero(t) || (config.highlights.length ? h('section', { class: 'section' }, h('div', { class: 'wrap' }, renderHighlights())) : null),
                 config.sections.length
-                    ? config.sections.map(section => renderSection(section, t))
+                    ? renderDemos(t)
                     : h('section', { class: 'section' }, h('div', { class: 'wrap' }, h('div', { class: 'panel empty' }, t.noDemos))),
                 renderHowto(t),
             ),
@@ -566,7 +593,48 @@
                 h('a', { class: 'btn btn--primary', href: url, target: '_blank', rel: 'noopener' }, t.openTab, icon('arrow')),
             );
         }
-        return h('iframe', { id: 'stage', src: url, title: tr(demo.title), allow: 'fullscreen' });
+        return [
+            h('iframe', { id: 'stage', src: url, title: tr(demo.title), allow: 'fullscreen' }),
+            !stageShowing &&
+                h(
+                    'div',
+                    { class: 'live-loading', role: 'status' },
+                    demo.image && h('img', { src: demo.image, alt: '' }),
+                    h('span', { class: 'live-loading-note' }, h('span', { class: 'spinner' }), t.loading),
+                ),
+        ];
+    }
+
+    /**
+     * Takes the preview away as soon as the live view shows something. The load event of the frame is no
+     * help: a visualization only starts to build its view then, behind its own loading animation. Its
+     * first text is the sign that the view stands. A frame on another origin cannot be asked, there the
+     * load event has to do.
+     */
+    function watchStage() {
+        const frame = document.getElementById('stage');
+        if (!frame || frame === watchedFrame || stageShowing) {
+            return;
+        }
+        watchedFrame = frame;
+        const started = Date.now();
+        let loaded = false;
+        frame.addEventListener('load', () => (loaded = true), { once: true });
+        const timer = setInterval(() => {
+            if (frame !== document.getElementById('stage')) {
+                clearInterval(timer);
+                return;
+            }
+            const view = frame.contentDocument;
+            const showing = loaded && (!view || view.body?.innerText?.trim());
+            if (showing || Date.now() - started > STAGE_WAIT_MS) {
+                clearInterval(timer);
+                stageShowing = true;
+                const preview = app.querySelector('.live-loading');
+                preview?.classList.add('is-done');
+                setTimeout(() => preview?.remove(), STAGE_FADE_MS);
+            }
+        }, STAGE_POLL_MS);
     }
 
     function renderLive(demo, t) {
@@ -584,7 +652,7 @@
                 h(
                     'nav',
                     { class: 'live-tabs', 'aria-label': t.viewNav },
-                    allDemos().map(item =>
+                    liveDemos().map(item =>
                         h(
                             'button',
                             {
@@ -653,11 +721,14 @@
     /** The demo of a `?live=<id>` address, or null for the overview */
     function currentDemo() {
         const id = new URLSearchParams(window.location.search).get('live');
-        return (id && allDemos().find(demo => demo.id === id)) || null;
+        return (id && liveDemos().find(demo => demo.id === id)) || null;
     }
 
     let renderedDemoId = null;
     let rendered = false;
+    /** Whether the current live frame shows its view, and the frame that is being watched for it */
+    let stageShowing = false;
+    let watchedFrame = null;
     /** The motion layer and the moment load after the first paint, because they work on the rendered page */
     let motionLoader = null;
     let momentsLoader = null;
@@ -691,6 +762,8 @@
         const keepFrame = !!(demo && frame && renderedDemoId === demo.id && availability[demo.id] !== false && canEmbed(demo));
         if (keepFrame) {
             frame.remove();
+        } else {
+            stageShowing = false;
         }
         const scrollY = window.scrollY;
         momentsLoader?.then(loader => loader?.unmountAll(app));
@@ -702,6 +775,7 @@
         renderedDemoId = demo ? demo.id : null;
         rendered = true;
         heroEntered = heroEntered || !demo;
+        watchStage();
         startMotion();
     }
 
@@ -751,7 +825,7 @@
             lang = pickLanguage(config.defaultLanguage);
             let shown = false;
             const checks = checkAvailability().then(() => {
-                if (shown && allDemos().some(demo => availability[demo.id] === false)) {
+                if (shown && liveDemos().some(demo => availability[demo.id] === false)) {
                     render();
                 }
             });

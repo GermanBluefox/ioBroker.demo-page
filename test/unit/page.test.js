@@ -149,6 +149,28 @@ describe('page description', () => {
         assert.equal(sections[0].demos[0].live.url, '../devices/index.html');
     });
 
+    it('has a heading above all demos, by default "Vorlagen"', async () => {
+        assert.deepEqual((await buildPage(fakeAdapter(), { demos: [] })).demosTitle, { de: 'Vorlagen', en: 'Templates' });
+        assert.deepEqual((await buildPage(fakeAdapter(), { demos: [], demosTitle: 'Beispiele' })).demosTitle, { de: 'Beispiele', en: '' });
+    });
+
+    it('shows a demo that is not live yet without an address, even if nothing of it exists so far', async () => {
+        const adapter = fakeAdapter();
+        const { sections } = await buildPage(adapter, {
+            demos: [
+                { type: 'aura', project: 'not-there', liveSoon: true },
+                { type: 'unknown', liveSoon: true },
+            ],
+        });
+        assert.equal(sections.length, 1);
+        assert.equal(sections[0].title.de, 'Aura');
+        const [demo] = sections[0].demos;
+        assert.equal(demo.soon, true);
+        assert.equal(demo.live, undefined);
+        assert.equal(demo.title.de, 'Aura');
+        assert.equal(adapter.warnings.length, 1);
+    });
+
     it('groups by section in the configured order and defaults to the visualization', async () => {
         const { sections } = await page([
             { type: 'vis-2', project: 'modern', section: 'Favoriten', sectionEn: 'Favourites' },

@@ -10,7 +10,8 @@ example on a demo system.
 1. Install the adapter and add an instance. It needs a running `web` instance, which serves the page at
    `/demo-page/index.html`.
 2. In the instance configuration, add one entry per demo on the tab **Demos**. Project and view are selected
-   from the lists of the existing projects. Save, and the page is published.
+   from the lists of the existing projects. Save, and the page is published. All demos stand under one heading,
+   grouped in one block per visualization. An entry marked as **Not live yet** only shows its card.
 3. Choose which parts of the page are shown and what they say on the tabs **Page sections** and
    **Live view and links**.
 4. To replace the standard page of `web`, enter `/demo-page/` as **default redirect** in the settings of the
@@ -48,6 +49,58 @@ this port must be reachable by visitors. They open in a new tab. For Aura, set `
 by web as `/aura/` and can be embedded.
 
 ## Changelog
+
+### 0.1.13 (2026-11-09)
+
+- (bluefox) The bar of the live view shows only the names of the visualizations, without a label in front.
+
+### 0.1.12 (2026-11-09)
+
+- (bluefox) The bar of the live view says that it chooses between visualizations.
+
+### 0.1.11 (2026-11-09)
+
+- (bluefox) All tiles have the same space inside: 32 px to their edge, 24 px on a phone, and 16 px between title and text.
+- (bluefox) 128 px between the sections, running text at 16 px, and filled secondary buttons that stand off the page.
+- (bluefox) The install button leads to the installation page of iobroker.com by default.
+
+### 0.1.10 (2026-11-09)
+
+- (bluefox) The highlights have more space inside: 32 px to their edge, 24 px on a phone, and 16 px between title and text.
+
+### 0.1.9 (2026-11-09)
+
+- (bluefox) The highlights stand another 30 px further below the hero, and their title has more distance to their text.
+
+### 0.1.8 (2026-11-09)
+
+- (bluefox) The green LIVE dot fades in and out, unless the visitor asked for reduced motion.
+- (bluefox) The highlights stand 40 px further below the hero.
+
+### 0.1.7 (2026-11-09)
+
+- (bluefox) In the hero, the text starts at the upper edge of the picture and the buttons end at its lower edge.
+
+### 0.1.6 (2026-11-09)
+
+- (bluefox) All content, the hero included, stands left-aligned on one edge and is at most 1312 px wide: 64 px from the edge of the display, 32 px below 900 px and 20 px below 600 px. The header keeps 32 px over the whole display, and 20 px below 600 px.
+
+### 0.1.5 (2026-11-09)
+
+- (bluefox) The distances to the edge of the display are those of iobroker.com: the header and the hero run over the whole display, with 32 and 64 px, and the content is at most 1312 px wide with 32 px. Below 900 px the hero also has 32 px, and below 600 px everything has 20 px.
+
+### 0.1.4 (2026-11-09)
+
+- (bluefox) All demos stand under one heading ("Vorlagen" by default), which is also the name in the menu and on the hero button. It replaces the menu name per section of 0.1.3.
+- (bluefox) Below the heading, the demos are grouped in one block per visualization.
+- (bluefox) A demo can be marked as not live yet: its card is shown as coming soon, without a link and without an address in the page description.
+
+### 0.1.3 (2026-11-09)
+
+- (bluefox) While a live view loads, its screenshot stands over it with a loading note.
+- (bluefox) A section can have its own name for the menu and the hero button.
+- (bluefox) The LIVE mark stands above the hero picture instead of covering it.
+- (bluefox) The default footer links include the privacy policy.
 
 ### 0.1.2 (2026-11-09)
 

@@ -11,6 +11,8 @@
                     "text": "demos_hint",
                     "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
                 },
+                "demosTitle": { "type": "text", "label": "Heading above all demos", "help": "demos_title_help", "newLine": true, "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
+                "demosTitleEn": { "type": "text", "label": "Heading (English)", "xs": 12, "sm": 6, "md": 3, "lg": 3, "xl": 3 },
                 "demos": {
                     "type": "accordion",
                     "titleAttr": "title",
@@ -110,22 +112,23 @@
                         {
                             "type": "text",
                             "attr": "section",
-                            "label": "Section on the page",
+                            "label": "Block on the page",
                             "help": "section_help",
                             "newLine": true,
-                            "xs": 12, "sm": 12, "md": 6, "lg": 3, "xl": 3
+                            "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
                         },
                         {
                             "type": "text",
                             "attr": "sectionEn",
-                            "label": "Section (English)",
-                            "xs": 12, "sm": 12, "md": 6, "lg": 3, "xl": 3
+                            "label": "Block (English)",
+                            "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
                         },
                         {
                             "type": "chips",
                             "attr": "tags",
                             "label": "Used adapters",
-                            "xs": 12, "sm": 12, "md": 12, "lg": 6, "xl": 6
+                            "newLine": true,
+                            "xs": 12, "sm": 12, "md": 12, "lg": 12, "xl": 12
                         },
                         {
                             "type": "file",
@@ -153,14 +156,21 @@
                             "label": "Template comes later",
                             "hidden": "!!data.downloadUrl",
                             "newLine": true,
-                            "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
+                            "xs": 12, "sm": 12, "md": 4, "lg": 4, "xl": 4
                         },
                         {
                             "type": "checkbox",
                             "attr": "newTab",
                             "label": "Open in a new tab",
                             "help": "new_tab_help",
-                            "xs": 12, "sm": 12, "md": 6, "lg": 6, "xl": 6
+                            "xs": 12, "sm": 12, "md": 4, "lg": 4, "xl": 4
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "liveSoon",
+                            "label": "Not live yet",
+                            "help": "live_soon_help",
+                            "xs": 12, "sm": 12, "md": 4, "lg": 4, "xl": 4
                         }
                     ]
                 }
