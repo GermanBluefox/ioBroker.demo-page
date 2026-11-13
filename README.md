@@ -50,6 +50,14 @@ by web as `/aura/` and can be embedded.
 
 ## Changelog
 
+### 0.1.15 (2026-11-13)
+
+- (bluefox) A dialog "Download project" for vis-2 projects with the files and the steps to set them up. Web addresses in a description become links that open in a new tab. The description always lies below the live view, on every screen width, so a dialog of the visualization always opens in view.
+
+### 0.1.14 (2026-11-10)
+
+- (bluefox) The visualization of the live view takes the full width, and the description lies below it in a row; only on very wide screens (from 1800 px) do both stand side by side. A description keeps its line breaks and flows in columns; a card shows only its first three lines.
+
 ### 0.1.13 (2026-11-09)
 
 - (bluefox) The bar of the live view shows only the names of the visualizations, without a label in front.
