@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "demo-page",
-        "version": "0.1.15",
+        "version": "0.1.16",
         "news": {
+            "0.1.16": {
+                "en": "Links with a label in descriptions and highlight tiles ([label](url)); four highlight tiles stand in one row or in two rows of two; wider page, title in two lines, download button beside the description, the dialog asks for vis-2 2.20.10",
+                "de": "Links mit Beschriftung in Beschreibungen und Kacheln der Startseite ([Text](URL)); vier Kacheln stehen in einer Reihe oder in zwei Reihen zu zwei; breitere Seite, Titel in zwei Zeilen, Download-Knopf neben der Beschreibung, der Dialog nennt vis-2 ab 2.20.10",
+                "ru": "Ссылки с подписью в описаниях и плитках главной страницы ([текст](URL)); четыре плитки стоят в одном ряду или в двух рядах по две; более широкая страница, заголовок в две строки, кнопка загрузки рядом с описанием, диалог требует vis-2 от 2.20.10",
+                "pt": "Ligações com legenda nas descrições e nos cartões da página inicial ([texto](URL)); quatro cartões ficam numa linha ou em duas linhas de dois; página mais larga, título em duas linhas, botão de download junto à descrição, o diálogo pede vis-2 2.20.10",
+                "nl": "Links met een label in beschrijvingen en tegels van de startpagina ([tekst](URL)); vier tegels staan in één rij of in twee rijen van twee; bredere pagina, titel in twee regels, downloadknop naast de beschrijving, het dialoogvenster vraagt vis-2 2.20.10",
+                "fr": "Liens avec libellé dans les descriptions et les tuiles de la page d’accueil ([texte](URL)) ; quatre tuiles tiennent sur une ligne ou sur deux lignes de deux ; page plus large, titre sur deux lignes, bouton de téléchargement à côté de la description, la boîte de dialogue demande vis-2 2.20.10",
+                "it": "Link con etichetta nelle descrizioni e nei riquadri della pagina iniziale ([testo](URL)); quattro riquadri stanno su una riga o su due righe da due; pagina più larga, titolo su due righe, pulsante di download accanto alla descrizione, la finestra richiede vis-2 2.20.10",
+                "es": "Enlaces con texto en las descripciones y en los recuadros de la página de inicio ([texto](URL)); cuatro recuadros quedan en una fila o en dos filas de dos; página más ancha, título en dos líneas, botón de descarga junto a la descripción, el diálogo pide vis-2 2.20.10",
+                "pl": "Linki z opisem w opisach i kafelkach strony głównej ([tekst](URL)); cztery kafelki stoją w jednym rzędzie lub w dwóch rzędach po dwa; szersza strona, tytuł w dwóch wierszach, przycisk pobierania obok opisu, okno wymaga vis-2 2.20.10",
+                "uk": "Посилання з підписом в описах і плитках головної сторінки ([текст](URL)); чотири плитки стоять в одному ряду або у двох рядах по дві; ширша сторінка, заголовок у два рядки, кнопка завантаження біля опису, діалог вимагає vis-2 від 2.20.10",
+                "zh-cn": "描述和首页磁贴中支持带文字的链接（[文字](URL)）；四个磁贴排成一行或两行各两个；页面更宽，标题分两行，下载按钮位于描述旁，对话框要求 vis-2 2.20.10 或更新"
+            },
             "0.1.15": {
                 "en": "Dialog to download a vis-2 project with the steps to set it up; links in descriptions open in a new tab; the description always lies below the live view, on every screen width",
                 "de": "Dialog zum Herunterladen eines vis-2-Projekts mit den Schritten zur Einrichtung; Links in Beschreibungen öffnen sich in einem neuen Tab; die Beschreibung steht bei jeder Bildschirmbreite unter der Live-Ansicht",

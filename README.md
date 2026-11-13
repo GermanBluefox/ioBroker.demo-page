@@ -50,6 +50,11 @@ by web as `/aura/` and can be embedded.
 
 ## Changelog
 
+### 0.1.16 (2026-11-13)
+
+- (bluefox) A description or a highlight tile can carry a link with a label of its own: `[label](https://…)`; a plain web address still becomes a link. Four highlight tiles stand in one row or in two rows of two, never three and a single one.
+- (bluefox) The page is wider (up to 1600 px) and the title of the start page always takes two lines. The button "Download project" stands beside the title of the description instead of taking a row of its own. The download dialog asks for vis-2 2.20.10 or newer and for updated widget sets. The page loads its script and styles with the version in the address, so a browser does not keep an old copy after an update.
+
 ### 0.1.15 (2026-11-13)
 
 - (bluefox) A dialog "Download project" for vis-2 projects with the files and the steps to set them up. Web addresses in a description become links that open in a new tab. The description always lies below the live view, on every screen width, so a dialog of the visualization always opens in view.
