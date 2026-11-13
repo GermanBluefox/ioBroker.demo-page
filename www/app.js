@@ -144,6 +144,15 @@
         return element;
     }
 
+    /** Plain text with its web addresses turned into links that open in a new tab */
+    function linkify(text) {
+        return text
+            .split(/(https?:\/\/[^\s]+)/g)
+            .map((part, i) =>
+                i % 2 ? h('a', { href: part, target: '_blank', rel: 'noopener noreferrer' }, part) : part,
+            );
+    }
+
     function icon(name) {
         const definition = ICONS[name];
         const svg = document.createElementNS(SVG_NS, 'svg');
@@ -696,7 +705,7 @@
                         { class: 'panel' },
                         h('p', { class: 'side-label' }, t.thisView),
                         h('h1', null, tr(demo.title)),
-                        tr(demo.desc) && h('p', null, tr(demo.desc)),
+                        tr(demo.desc) && h('p', null, linkify(tr(demo.desc))),
                         demo.tags.length
                             ? [
                                   h('p', { class: 'side-note' }, t.usedAdapters),
@@ -711,11 +720,155 @@
                             h('p', { class: 'side-label' }, t.notice),
                             h('p', null, tr(config.notice)),
                         ),
-                    config.guide?.url &&
-                        h('a', { class: 'btn btn--secondary btn-row', href: config.guide.url }, tr(config.guide.label), icon('arrow')),
+                    setupProject(demo)
+                        ? h(
+                              'button',
+                              { type: 'button', class: 'btn btn--secondary btn-row', onclick: () => openSetup(demo) },
+                              SETUP[lang === 'en' ? 'en' : 'de'].button,
+                              icon('download'),
+                          )
+                        : config.guide?.url &&
+                          h('a', { class: 'btn btn--secondary btn-row', href: config.guide.url }, tr(config.guide.label), icon('arrow')),
                 ),
             ),
         );
+    }
+
+    /*
+     * "Projekt herunterladen": a dialog with the files of a vis-2 project and the steps to set it up at home.
+     * The files lie in demo-page.0/downloads/<project>.zip (vis-2 import format) and
+     * demo-page.0/downloads/<project>-datenpunkte.json (objects for the Admin import).
+     */
+    const DOWNLOADS = '../demo-page.0/downloads/';
+    const ADAPTER_NOTES = {
+        de: {
+            'vis-2-widgets-jaeger-design': 'Widgets im Jäger Design, brauchen eine eigene Lizenz',
+            'vis-2-widgets-glashaus': 'Widgets im Glashaus-Stil',
+            'mihome-vacuum': 'nur für die Karte des Saugroboters',
+        },
+        en: {
+            'vis-2-widgets-jaeger-design': 'widgets in the Jäger design, need a license of their own',
+            'vis-2-widgets-glashaus': 'widgets in the Glashaus style',
+            'mihome-vacuum': 'only for the map of the robot vacuum',
+        },
+    };
+    const SETUP = {
+        de: {
+            button: 'PROJEKT HERUNTERLADEN',
+            title: 'Projekt herunterladen und einrichten',
+            intro: 'So bekommen Sie diese Visualisierung in Ihr eigenes ioBroker. Sie brauchen dafür zwei Dateien:',
+            fileProject: 'Projekt für vis-2 (.zip)',
+            fileStates: 'Datenpunkte (.json)',
+            steps: [
+                ['Adapter installieren', 'In ioBroker Admin unter „Adapter“ installieren: web und vis-2'],
+                [
+                    'Datenpunkte anlegen',
+                    'In Admin „Objekte“ öffnen, den Expertenmodus einschalten und über das Symbol zum Hochladen die Datei mit den Datenpunkten importieren. Es entsteht der Ordner 0_userdata.0.Demo mit allen Datenpunkten, die das Projekt benutzt.',
+                ],
+                [
+                    'Projekt importieren',
+                    'Den vis-2 Editor öffnen, oben auf „Projekte“ gehen und „Projekt importieren“ wählen. Die .zip-Datei auswählen und den Namen „%s“ unverändert lassen, denn Bilder und Dateien werden unter diesem Namen gesucht.',
+                ],
+                [
+                    'Eigene Geräte verbinden',
+                    'Im Editor ein Widget anklicken und bei der Objekt-ID den Demo-Datenpunkt durch den eigenen ersetzen. Alternativ schreibt ein Skript die Werte Ihrer Geräte in die Demo-Datenpunkte.',
+                ],
+            ],
+            alsoAdapters: 'Dazu für dieses Projekt:',
+            hint: 'Solange keine Geräte verbunden sind, bleiben die Werte leer. Zum Ausprobieren lassen sich Werte in Admin unter „Objekte“ von Hand setzen.',
+            more: 'Mehr Anleitungen auf iobroker.com',
+            close: 'Schließen',
+        },
+        en: {
+            button: 'DOWNLOAD PROJECT',
+            title: 'Download and set up the project',
+            intro: 'This is how you get this visualization into your own ioBroker. You need two files:',
+            fileProject: 'Project for vis-2 (.zip)',
+            fileStates: 'States (.json)',
+            steps: [
+                ['Install adapters', 'In ioBroker Admin under "Adapters" install: web and vis-2'],
+                [
+                    'Create the states',
+                    'Open "Objects" in Admin, switch on the expert mode and import the file with the states with the upload icon. This creates the folder 0_userdata.0.Demo with all states the project uses.',
+                ],
+                [
+                    'Import the project',
+                    'Open the vis-2 editor, go to "Projects" and choose "Import project". Select the .zip file and keep the name "%s", because pictures and files are looked up under this name.',
+                ],
+                [
+                    'Connect your own devices',
+                    'Click a widget in the editor and replace the demo state in its object ID with your own. Or let a script write the values of your devices into the demo states.',
+                ],
+            ],
+            alsoAdapters: 'Plus for this project:',
+            hint: 'As long as no devices are connected, the values stay empty. To try it out, set values by hand in Admin under "Objects".',
+            more: 'More guides on iobroker.com',
+            close: 'Close',
+        },
+    };
+
+    /** The vis-2 project of a demo, or '' if it has nothing to download */
+    function setupProject(demo) {
+        if (demo.type !== 'vis-2' || !demo.live?.url) {
+            return '';
+        }
+        const match = /\?([^#&]+)/.exec(demo.live.url);
+        return match ? decodeURIComponent(match[1]) : '';
+    }
+
+    function openSetup(demo) {
+        const s = SETUP[lang === 'en' ? 'en' : 'de'];
+        const notes = ADAPTER_NOTES[lang === 'en' ? 'en' : 'de'];
+        const project = setupProject(demo);
+        const extra = demo.tags.filter(tag => tag !== 'vis-2');
+        const dialog = h(
+            'dialog',
+            { class: 'setup-dialog', 'aria-labelledby': 'setup-title' },
+            h(
+                'div',
+                { class: 'setup-head' },
+                h('div', null, h('p', { class: 'side-label' }, tr(demo.title)), h('h2', { id: 'setup-title' }, s.title)),
+                h('button', { type: 'button', class: 'setup-close', 'aria-label': s.close, onclick: () => dialog.close() }, '×'),
+            ),
+            h('p', { class: 'setup-intro' }, s.intro),
+            h(
+                'div',
+                { class: 'setup-files' },
+                h('a', { class: 'btn btn--primary', href: `${DOWNLOADS}${project}.zip`, download: '' }, icon('download'), s.fileProject),
+                h(
+                    'a',
+                    { class: 'btn btn--secondary', href: `${DOWNLOADS}${project}-datenpunkte.json`, download: '' },
+                    icon('download'),
+                    s.fileStates,
+                ),
+            ),
+            h(
+                'ol',
+                { class: 'setup-steps' },
+                s.steps.map(([title, text], i) =>
+                    h(
+                        'li',
+                        null,
+                        h('h3', null, title),
+                        h('p', null, text.replace('%s', project)),
+                        i === 0 && extra.length
+                            ? h(
+                                  'p',
+                                  null,
+                                  s.alsoAdapters,
+                                  h('ul', null, extra.map(tag => h('li', null, h('b', null, tag), notes[tag] ? `: ${notes[tag]}` : ''))),
+                              )
+                            : null,
+                    ),
+                ),
+            ),
+            h('p', { class: 'setup-hint' }, s.hint),
+            config.guide?.url && h('a', { class: 'setup-more', href: config.guide.url }, s.more, icon('arrow')),
+        );
+        dialog.addEventListener('close', () => dialog.remove());
+        dialog.addEventListener('click', event => event.target === dialog && dialog.close());
+        document.body.append(dialog);
+        dialog.showModal();
     }
 
     /** The demo of a `?live=<id>` address, or null for the overview */
