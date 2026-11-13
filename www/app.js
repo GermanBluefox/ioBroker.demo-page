@@ -144,13 +144,23 @@
         return element;
     }
 
-    /** Plain text with its web addresses turned into links that open in a new tab */
+    /**
+     * Plain text with its links turned into links that open in a new tab: a web address stands for itself,
+     * [label](https://…) shows the label instead of the address
+     */
     function linkify(text) {
-        return text
-            .split(/(https?:\/\/[^\s]+)/g)
-            .map((part, i) =>
-                i % 2 ? h('a', { href: part, target: '_blank', rel: 'noopener noreferrer' }, part) : part,
-            );
+        const parts = [];
+        const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|(https?:\/\/[^\s]+)/g;
+        let last = 0;
+        let match;
+        while ((match = pattern.exec(text))) {
+            parts.push(text.slice(last, match.index));
+            const url = match[2] || match[3];
+            parts.push(h('a', { href: url, target: '_blank', rel: 'noopener noreferrer' }, match[1] || url));
+            last = pattern.lastIndex;
+        }
+        parts.push(text.slice(last));
+        return parts;
     }
 
     function icon(name) {
@@ -356,7 +366,7 @@
                     'div',
                     { class: 'highlight' },
                     h('p', { class: 'highlight-title' }, tr(item.title)),
-                    h('p', null, tr(item.text)),
+                    h('p', null, linkify(tr(item.text))),
                 ),
             ),
         );
@@ -703,8 +713,13 @@
                     h(
                         'section',
                         { class: 'panel' },
-                        h('p', { class: 'side-label' }, t.thisView),
-                        h('h1', null, tr(demo.title)),
+                        // the action stands in the head of the description, beside the title, and takes no row of its own
+                        h(
+                            'div',
+                            { class: 'side-head' },
+                            h('div', null, h('p', { class: 'side-label' }, t.thisView), h('h1', null, tr(demo.title))),
+                            renderSideAction(demo),
+                        ),
                         tr(demo.desc) && h('p', null, linkify(tr(demo.desc))),
                         demo.tags.length
                             ? [
@@ -720,17 +735,24 @@
                             h('p', { class: 'side-label' }, t.notice),
                             h('p', null, tr(config.notice)),
                         ),
-                    setupProject(demo)
-                        ? h(
-                              'button',
-                              { type: 'button', class: 'btn btn--secondary btn-row', onclick: () => openSetup(demo) },
-                              SETUP[lang === 'en' ? 'en' : 'de'].button,
-                              icon('download'),
-                          )
-                        : config.guide?.url &&
-                          h('a', { class: 'btn btn--secondary btn-row', href: config.guide.url }, tr(config.guide.label), icon('arrow')),
                 ),
             ),
+        );
+    }
+
+    /** The action of a live view: the download of its project, else the guide on iobroker.com */
+    function renderSideAction(demo) {
+        if (setupProject(demo)) {
+            return h(
+                'button',
+                { type: 'button', class: 'btn btn--secondary btn-row side-action', onclick: () => openSetup(demo) },
+                SETUP[lang === 'en' ? 'en' : 'de'].button,
+                icon('download'),
+            );
+        }
+        return (
+            config.guide?.url &&
+            h('a', { class: 'btn btn--secondary btn-row side-action', href: config.guide.url }, tr(config.guide.label), icon('arrow'))
         );
     }
 
@@ -760,7 +782,10 @@
             fileProject: 'Projekt für vis-2 (.zip)',
             fileStates: 'Datenpunkte (.json)',
             steps: [
-                ['Adapter installieren', 'In ioBroker Admin unter „Adapter“ installieren: web und vis-2'],
+                [
+                    'Adapter installieren',
+                    'In ioBroker Admin unter „Adapter“ installieren oder aktualisieren: web und vis-2 ab Version 2.20.10. Ältere vis-2 Versionen zeigen manche Details der Demos nicht, etwa Fotos bei Personen. Andere installierte Widget-Sets ebenfalls aktualisieren, ältere Sets kann die neue vis-2 sonst nicht laden.',
+                ],
                 [
                     'Datenpunkte anlegen',
                     'In Admin „Objekte“ öffnen, den Expertenmodus einschalten und über das Symbol zum Hochladen die Datei mit den Datenpunkten importieren. Es entsteht der Ordner 0_userdata.0.Demo mit allen Datenpunkten, die das Projekt benutzt.',
@@ -775,7 +800,7 @@
                 ],
             ],
             alsoAdapters: 'Dazu für dieses Projekt:',
-            hint: 'Solange keine Geräte verbunden sind, bleiben die Werte leer. Zum Ausprobieren lassen sich Werte in Admin unter „Objekte“ von Hand setzen.',
+            hint: 'Die Datenpunkte bringen eine Momentaufnahme der Demo-Werte mit, das Projekt sieht also gleich nach dem Import gefüllt aus. Die Werte ändern sich aber erst, wenn eigene Geräte verbunden sind. Zum Ausprobieren lassen sich Werte in Admin unter „Objekte“ von Hand setzen.',
             more: 'Mehr Anleitungen auf iobroker.com',
             close: 'Schließen',
         },
@@ -786,7 +811,10 @@
             fileProject: 'Project for vis-2 (.zip)',
             fileStates: 'States (.json)',
             steps: [
-                ['Install adapters', 'In ioBroker Admin under "Adapters" install: web and vis-2'],
+                [
+                    'Install adapters',
+                    'In ioBroker Admin under "Adapters" install or update: web and vis-2 version 2.20.10 or newer. Older vis-2 versions do not show some details of the demos, like photos of persons. Update other installed widget sets as well, the new vis-2 cannot load older sets.',
+                ],
                 [
                     'Create the states',
                     'Open "Objects" in Admin, switch on the expert mode and import the file with the states with the upload icon. This creates the folder 0_userdata.0.Demo with all states the project uses.',
@@ -801,7 +829,7 @@
                 ],
             ],
             alsoAdapters: 'Plus for this project:',
-            hint: 'As long as no devices are connected, the values stay empty. To try it out, set values by hand in Admin under "Objects".',
+            hint: 'The states come with a snapshot of the demo values, so the project looks filled right after the import. The values only change once your own devices are connected. To try it out, set values by hand in Admin under "Objects".',
             more: 'More guides on iobroker.com',
             close: 'Close',
         },

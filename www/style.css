@@ -123,7 +123,7 @@ p {
 
 /*
  * The distances to the edge of the display follow iobroker.com: the bars have the distance of its header,
- * the content that of its hero. All content stands left-aligned on one edge, at most 1312px wide.
+ * the content that of its hero. All content stands left-aligned on one edge, at most 1600px wide.
  */
 :root {
     --bar-edge: 32px;
@@ -143,7 +143,7 @@ p {
     }
 }
 .wrap {
-    width: min(1312px, 100% - 2 * var(--page-edge));
+    width: min(1600px, 100% - 2 * var(--page-edge));
     margin-left: var(--page-edge);
 }
 
@@ -354,6 +354,8 @@ p {
 .hero-copy {
     grid-column: span 5;
     min-width: 0;
+    /* the title takes its size from the width of this column, see .hero h1 */
+    container-type: inline-size;
 }
 .kicker {
     font: 18px var(--display);
@@ -361,10 +363,13 @@ p {
 }
 .hero h1 {
     margin-top: 14px;
-    font-size: clamp(32px, 4vw, 46px);
+    /* small enough that each line of the title fits the column: the longest line is about 10.7em */
+    font-size: clamp(22px, 9cqi, 46px);
     line-height: 1.12;
     font-weight: 900;
     letter-spacing: -0.01em;
+    /* a line break in the title stays: the title is set in lines of its own */
+    white-space: pre-line;
 }
 .hero-lead {
     margin-top: 18px;
@@ -472,6 +477,20 @@ p {
     grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
     gap: var(--gutter);
 }
+/* Four tiles stand in one row or in two rows of two, never three and a single one */
+.grid-highlights:has(> .highlight:nth-child(4):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 1100px) {
+    .grid-highlights:has(> .highlight:nth-child(4):last-child) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+@media (max-width: 599px) {
+    .grid-highlights:has(> .highlight:nth-child(4):last-child) {
+        grid-template-columns: 1fr;
+    }
+}
 .highlight {
     padding: var(--tile-pad);
     background: var(--surface);
@@ -482,11 +501,18 @@ p {
     font-size: 16px;
     line-height: 1.5;
     color: var(--text-muted);
+    overflow-wrap: anywhere;
 }
 .highlight p.highlight-title {
     margin-bottom: 16px;
     font: 400 16px var(--display);
     color: var(--accent);
+}
+.highlight p a {
+    color: var(--link);
+}
+.highlight p a:hover {
+    color: var(--link-hover);
 }
 .section {
     padding: 128px 0 0;
@@ -950,6 +976,23 @@ p {
 }
 .live-side section {
     padding: var(--tile-pad);
+}
+/* Label and title on the left, the action (download or guide) on the right; on a narrow screen it goes below */
+.side-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px 32px;
+    /* a clear gap between the head and the text (it collapses with the 16px above the description) */
+    margin-bottom: 32px;
+}
+.side-head > div {
+    min-width: 0;
+}
+.side-head .side-action {
+    flex: 0 0 auto;
+    gap: 24px;
 }
 .side-label {
     font: 13px var(--display);
