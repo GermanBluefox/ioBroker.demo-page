@@ -803,7 +803,7 @@ p {
 }
 .live-header {
     position: relative;
-    padding: 10px var(--bar-edge);
+    padding: 6px var(--bar-edge);
     display: flex;
     align-items: center;
     gap: 10px 20px;
@@ -821,14 +821,26 @@ p {
     background: var(--surface);
     font-size: 12px;
 }
+/* The views take a row of their own below brand and actions; on a wide screen everything fits in one row */
 .live-tabs {
-    margin-left: 8px;
+    flex: 1 1 100%;
+    margin-left: -14px;
     display: flex;
     gap: 4px;
     flex-wrap: wrap;
 }
+@media (min-width: 1700px) {
+    .live-tabs {
+        flex-basis: auto;
+        order: 1;
+        margin-left: 8px;
+    }
+    .live-actions {
+        order: 2;
+    }
+}
 .live-tabs button {
-    min-height: 44px;
+    min-height: 38px;
     padding: 0 14px;
     border: 0;
     border-radius: 10px;
@@ -848,7 +860,11 @@ p {
     gap: 8px;
     flex-wrap: wrap;
 }
+.live-actions {
+    align-items: center;
+}
 .live-actions .btn {
+    min-height: 36px;
     padding: 0 14px;
     font-size: 13px;
 }
@@ -1034,11 +1050,7 @@ p {
     padding: 0 16px;
     font-size: 13px;
 }
-@media (max-width: 900px) {
-    .live-actions {
-        margin-left: 0;
-    }
-}
+
 
 .status {
     min-height: 100vh;

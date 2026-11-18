@@ -668,21 +668,7 @@
                 { class: 'live-header' },
                 brand(),
                 h('span', { class: 'live-pill' }, h('span', { class: `dot${available ? '' : ' off'}` }), available ? t.live : t.unavailable),
-                h(
-                    'nav',
-                    { class: 'live-tabs', 'aria-label': t.viewNav },
-                    liveDemos().map(item =>
-                        h(
-                            'button',
-                            {
-                                type: 'button',
-                                'aria-pressed': item.id === demo.id ? 'true' : 'false',
-                                onclick: () => navigate(liveUrl(item)),
-                            },
-                            tr(item.tab) || tr(item.title),
-                        ),
-                    ),
-                ),
+                // the actions stand in the first row beside the brand, the views get the second row
                 h(
                     'div',
                     { class: 'live-actions' },
@@ -701,6 +687,21 @@
                         h('a', { class: 'btn btn--primary', href: download.url, download: '' }, icon('download'), t.downloadTemplate),
                     !download?.url && download?.soon && h('span', { class: 'btn btn-muted' }, icon('download'), t.downloadSoon),
                     languageSwitch(),
+                ),
+                h(
+                    'nav',
+                    { class: 'live-tabs', 'aria-label': t.viewNav },
+                    liveDemos().map(item =>
+                        h(
+                            'button',
+                            {
+                                type: 'button',
+                                'aria-pressed': item.id === demo.id ? 'true' : 'false',
+                                onclick: () => navigate(liveUrl(item)),
+                            },
+                            tr(item.tab) || tr(item.title),
+                        ),
+                    ),
                 ),
             ),
             h(
@@ -740,19 +741,19 @@
         );
     }
 
-    /** The action of a live view: the download of its project, else the guide on iobroker.com */
+    /**
+     * The action of a live view: the download of its project. A demo without a project to download gets no button:
+     * a link to the start page of iobroker.com would only send the visitor away without an answer.
+     */
     function renderSideAction(demo) {
-        if (setupProject(demo)) {
-            return h(
-                'button',
-                { type: 'button', class: 'btn btn--secondary btn-row side-action', onclick: () => openSetup(demo) },
-                SETUP[lang === 'en' ? 'en' : 'de'].button,
-                icon('download'),
-            );
+        if (!setupProject(demo)) {
+            return null;
         }
-        return (
-            config.guide?.url &&
-            h('a', { class: 'btn btn--secondary btn-row side-action', href: config.guide.url }, tr(config.guide.label), icon('arrow'))
+        return h(
+            'button',
+            { type: 'button', class: 'btn btn--secondary btn-row side-action', onclick: () => openSetup(demo) },
+            SETUP[lang === 'en' ? 'en' : 'de'].button,
+            icon('download'),
         );
     }
 
@@ -835,20 +836,86 @@
         },
     };
 
-    /** The vis-2 project of a demo, or '' if it has nothing to download */
+    /*
+     * 3D Home: the floor plan is exported in the format of its "Projekte" dialog and lies in
+     * demo-page.0/downloads/<file>.json, the states again in <file>-datenpunkte.json.
+     */
+    const HOME3D_FILE = '3d-home-familie-mueller';
+    const SETUP_HOME3D = {
+        de: {
+            intro: 'So bekommen Sie dieses Haus in Ihr eigenes ioBroker. Sie brauchen dafür zwei Dateien:',
+            fileProject: 'Grundriss für 3D Home (.json)',
+            steps: [
+                [
+                    'Adapter installieren',
+                    'In ioBroker Admin unter „Adapter“ installieren: web und 3D Home (Adapter home3d). 3D Home läuft im web-Adapter, die Seite heißt dort /home3d/index.html.',
+                ],
+                [
+                    'Datenpunkte anlegen',
+                    'In Admin „Objekte“ öffnen, den Expertenmodus einschalten und über das Symbol zum Hochladen die Datei mit den Datenpunkten importieren. Es entsteht der Ordner 0_userdata.0.Demo mit allen Datenpunkten, die das Haus benutzt. Erst danach den Grundriss importieren, denn 3D Home prüft beim Import, ob die Datenpunkte da sind.',
+                ],
+                [
+                    'Grundriss importieren',
+                    '3D Home öffnen, oben auf „Projekte“ gehen und die Datei „%s.json“ importieren. Sie bringt Etagen, Räume, Möbel, Garten, Dach und die Zuordnung aller Geräte mit.',
+                ],
+                [
+                    'Eigene Geräte verbinden',
+                    'Über „Geräte verbinden“ die Demo-Datenpunkte durch eigene ersetzen oder neue Geräte aus dem Objektbaum wählen. Im Editor lassen sich Wände, Räume und Möbel an das eigene Haus anpassen.',
+                ],
+            ],
+            hint: 'Die Datenpunkte bringen eine Momentaufnahme der Demo-Werte mit, das Haus sieht also gleich nach dem Import belebt aus. Die Werte ändern sich aber erst, wenn eigene Geräte verbunden sind.',
+        },
+        en: {
+            intro: 'This is how you get this house into your own ioBroker. You need two files:',
+            fileProject: 'Floor plan for 3D Home (.json)',
+            steps: [
+                [
+                    'Install adapters',
+                    'In ioBroker Admin under "Adapters" install: web and 3D Home (adapter home3d). 3D Home runs inside the web adapter, its page is /home3d/index.html.',
+                ],
+                [
+                    'Create the states',
+                    'Open "Objects" in Admin, switch on the expert mode and import the file with the states with the upload icon. This creates the folder 0_userdata.0.Demo with all states the house uses. Import the floor plan only afterwards, as 3D Home checks on import whether the states exist.',
+                ],
+                [
+                    'Import the floor plan',
+                    'Open 3D Home, go to "Projekte" at the top and import the file "%s.json". It brings floors, rooms, furniture, garden, roof and the assignment of all devices.',
+                ],
+                [
+                    'Connect your own devices',
+                    'Replace the demo states with your own via "Geräte verbinden", or pick new devices from the object tree. In the editor walls, rooms and furniture can be adapted to your own house.',
+                ],
+            ],
+            hint: 'The states come with a snapshot of the demo values, so the house looks alive right after the import. The values only change once your own devices are connected.',
+        },
+    };
+
+    /** The project of a demo to download, or null if it has nothing to download */
     function setupProject(demo) {
-        if (demo.type !== 'vis-2' || !demo.live?.url) {
-            return '';
+        if (!demo.live?.url) {
+            return null;
+        }
+        if (demo.type === 'custom' && /\/home3d\/(index\.html)?(\?|#|$)/.test(demo.live.url)) {
+            // Every plan of the demo has its own floor plan file, the states are the same for all
+            const plan = /[?&]plan=([\w-]+)/.exec(demo.live.url)?.[1];
+            const name = plan && plan !== 'main' ? `${HOME3D_FILE}-${plan}` : HOME3D_FILE;
+            return { kind: 'home3d', name, states: HOME3D_FILE };
+        }
+        if (demo.type !== 'vis-2') {
+            return null;
         }
         const match = /\?([^#&]+)/.exec(demo.live.url);
-        return match ? decodeURIComponent(match[1]) : '';
+        return match ? { kind: 'vis-2', name: decodeURIComponent(match[1]) } : null;
     }
 
     function openSetup(demo) {
-        const s = SETUP[lang === 'en' ? 'en' : 'de'];
-        const notes = ADAPTER_NOTES[lang === 'en' ? 'en' : 'de'];
-        const project = setupProject(demo);
-        const extra = demo.tags.filter(tag => tag !== 'vis-2');
+        const language = lang === 'en' ? 'en' : 'de';
+        const setup = setupProject(demo);
+        const s = setup.kind === 'home3d' ? { ...SETUP[language], ...SETUP_HOME3D[language] } : SETUP[language];
+        const notes = ADAPTER_NOTES[language];
+        const project = setup.name;
+        const projectFile = setup.kind === 'home3d' ? `${project}.json` : `${project}.zip`;
+        const extra = demo.tags.filter(tag => tag !== 'vis-2' && tag !== 'home3d');
         const dialog = h(
             'dialog',
             { class: 'setup-dialog', 'aria-labelledby': 'setup-title' },
@@ -862,10 +929,10 @@
             h(
                 'div',
                 { class: 'setup-files' },
-                h('a', { class: 'btn btn--primary', href: `${DOWNLOADS}${project}.zip`, download: '' }, icon('download'), s.fileProject),
+                h('a', { class: 'btn btn--primary', href: `${DOWNLOADS}${projectFile}`, download: '' }, icon('download'), s.fileProject),
                 h(
                     'a',
-                    { class: 'btn btn--secondary', href: `${DOWNLOADS}${project}-datenpunkte.json`, download: '' },
+                    { class: 'btn btn--secondary', href: `${DOWNLOADS}${setup.states || project}-datenpunkte.json`, download: '' },
                     icon('download'),
                     s.fileStates,
                 ),
