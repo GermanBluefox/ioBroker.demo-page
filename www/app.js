@@ -21,12 +21,23 @@
     const UI = {
         de: {
             live: 'LIVE',
+            heroShow: 'Visualisierungen der Demo',
+            heroGo: 'Zeigen: %s',
             openLive: 'LIVE-DEMO ÖFFNEN',
             navLive: 'Live-Demo',
             home: 'Startseite',
             skip: 'Zum Inhalt springen',
             mainNav: 'Hauptnavigation',
             viewNav: 'Visualisierungen',
+            groupNav: 'Gruppen',
+            deviceNav: 'Für welches Gerät?',
+            deviceAll: 'Alle',
+            devices: { phone: 'Handy', tablet: 'Tablet', screen: 'Bildschirm', any: 'Passt sich jedem Gerät an' },
+            pickView: 'Visualisierung wählen',
+            prevView: 'Vorherige Visualisierung',
+            nextView: 'Nächste Visualisierung',
+            close: 'Schließen',
+            groups: { standard: 'Standard-Widgets', design: 'Design-Vorlagen', plan: 'Grundriss und 3D', more: 'Weitere Oberflächen' },
             download: 'HERUNTERLADEN',
             soon: 'BALD',
             soonBadge: 'DEMNÄCHST',
@@ -52,12 +63,23 @@
         },
         en: {
             live: 'LIVE',
+            heroShow: 'Visualizations of the demo',
+            heroGo: 'Show: %s',
             openLive: 'OPEN LIVE DEMO',
             navLive: 'Live demo',
             home: 'Home',
             skip: 'Skip to content',
             mainNav: 'Main navigation',
             viewNav: 'Visualizations',
+            groupNav: 'Groups',
+            deviceNav: 'For which device?',
+            deviceAll: 'All',
+            devices: { phone: 'Phone', tablet: 'Tablet', screen: 'Screen', any: 'Fits any device' },
+            pickView: 'Choose a visualization',
+            prevView: 'Previous visualization',
+            nextView: 'Next visualization',
+            close: 'Close',
+            groups: { standard: 'Standard widgets', design: 'Design templates', plan: 'Floor plan and 3D', more: 'More interfaces' },
             download: 'DOWNLOAD',
             soon: 'SOON',
             soonBadge: 'COMING SOON',
@@ -88,6 +110,13 @@
         arrow: { size: [28, 14], box: '0 0 30 16', paths: ['M1 8h27', 'M21 1l7 7-7 7'] },
         download: { size: [16, 16], box: '0 0 24 24', paths: ['M12 4v11', 'M7 10l5 5 5-5', 'M5 20h14'] },
         fullscreen: { size: [16, 16], box: '0 0 24 24', paths: ['M4 9V4h5', 'M20 9V4h-5', 'M4 15v5h5', 'M20 15v5h-5'] },
+        phone: { size: [16, 16], box: '0 0 24 24', paths: ['M9 2.5h6a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2z', 'M11 18.5h2'] },
+        tablet: { size: [16, 16], box: '0 0 24 24', paths: ['M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z', 'M18 12h.01'] },
+        screen: { size: [16, 16], box: '0 0 24 24', paths: ['M4.5 4h15a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-15a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z', 'M8 21h8', 'M12 17v4'] },
+        any: { size: [16, 16], box: '0 0 24 24', paths: ['M3.5 4h11a1.5 1.5 0 0 1 1.5 1.5V13', 'M2 5.5V12.5A1.5 1.5 0 0 0 3.5 14H12', 'M6 18h6', 'M16.8 9h3.9a1.3 1.3 0 0 1 1.3 1.3v8.4a1.3 1.3 0 0 1-1.3 1.3h-3.9a1.3 1.3 0 0 1-1.3-1.3v-8.4A1.3 1.3 0 0 1 16.8 9z'] },
+        chevron: { size: [14, 14], box: '0 0 24 24', paths: ['M6 9l6 6 6-6'] },
+        prev: { size: [20, 20], box: '0 0 24 24', paths: ['M15 6l-6 6 6 6'] },
+        next: { size: [20, 20], box: '0 0 24 24', paths: ['M9 6l6 6-6 6'] },
     };
 
     const app = document.getElementById('app');
@@ -96,6 +125,9 @@
     let config = null;
     let lang = 'de';
     let heroEntered = false;
+    /** The slide the hero shows; it outlives a rerender, so a language switch does not start over */
+    let heroSlide = 0;
+    let heroTimer = null;
 
     function pickLanguage(defaultLanguage) {
         let stored = null;
@@ -136,7 +168,7 @@
                 element.setAttribute(name, value);
             }
         }
-        for (const child of children.flat()) {
+        for (const child of children.flat(Infinity)) {
             if (child !== undefined && child !== null && child !== false) {
                 element.append(child);
             }
@@ -341,17 +373,129 @@
                                 h('a', { class: 'btn btn--secondary', href: `#${DEMOS_ID}` }, tr(config.demosTitle).toLocaleUpperCase(lang)),
                         ),
                     ),
-                    hero.image &&
+                    (hero.image || heroSlides().length > 1) &&
                         h(
                             'div',
                             { class: 'hero-media' },
                             firstDemo && h('span', { class: 'live-pill' }, h('span', { class: 'dot' }), t.live),
-                            h('div', { class: 'hero-shot', 'data-enter-media': true }, h('img', { src: hero.image, alt: tr(hero.title) })),
+                            heroSlides().length > 1
+                                ? renderHeroCarousel(t)
+                                : h('div', { class: 'hero-shot', 'data-enter-media': true }, h('img', { src: hero.image, alt: tr(hero.title) })),
                         ),
                 ),
                 renderHighlights(),
             ),
         );
+    }
+
+    /** Every demo that can be opened and has a picture: the hero shows them one after the other */
+    function heroSlides() {
+        return liveDemos().filter(demo => demo.image && availability[demo.id] !== false);
+    }
+
+    const HERO_SLIDE_MS = 2800;
+
+    function renderHeroCarousel(t) {
+        const slides = heroSlides();
+        heroSlide = heroSlide % slides.length;
+        const caption = h('a', { class: 'hero-caption-title', href: liveUrl(slides[heroSlide]), 'data-route': true }, tr(slides[heroSlide].title));
+        const dots = slides.map((demo, index) =>
+            h('button', {
+                type: 'button',
+                class: 'hero-dot',
+                'aria-label': t.heroGo.replace('%s', tr(demo.title)),
+                'aria-current': index === heroSlide ? 'true' : false,
+                onclick: () => {
+                    showHeroSlide(index);
+                    restartHeroTimer();
+                },
+            }),
+        );
+        const carousel = h(
+            'div',
+            {
+                class: 'hero-shot hero-carousel',
+                'data-enter-media': true,
+                role: 'group',
+                'aria-roledescription': 'carousel',
+                'aria-label': t.heroShow,
+                // Pointer or keyboard on the pictures holds them still
+                onmouseenter: () => stopHeroTimer(),
+                onmouseleave: () => restartHeroTimer(),
+                onfocusin: () => stopHeroTimer(),
+                onfocusout: () => restartHeroTimer(),
+            },
+            h(
+                'div',
+                { class: 'hero-slides' },
+                slides.map((demo, index) =>
+                    h(
+                        'a',
+                        {
+                            class: `hero-slide${index === heroSlide ? ' is-active' : ''}`,
+                            href: liveUrl(demo),
+                            'data-route': true,
+                            'aria-hidden': index === heroSlide ? false : 'true',
+                            tabindex: index === heroSlide ? false : '-1',
+                        },
+                        h('img', { src: demo.image, alt: tr(demo.title), loading: index ? 'lazy' : false, decoding: 'async' }),
+                    ),
+                ),
+            ),
+            h('div', { class: 'hero-caption' }, caption, h('div', { class: 'hero-dots' }, dots)),
+        );
+        restartHeroTimer();
+        return carousel;
+    }
+
+    function showHeroSlide(index) {
+        const slides = heroSlides();
+        const carousel = app.querySelector('.hero-carousel');
+        if (!carousel || !slides.length) {
+            return;
+        }
+        heroSlide = (index + slides.length) % slides.length;
+        carousel.querySelectorAll('.hero-slide').forEach((slide, i) => {
+            const active = i === heroSlide;
+            slide.classList.toggle('is-active', active);
+            if (active) {
+                slide.removeAttribute('aria-hidden');
+                slide.removeAttribute('tabindex');
+            } else {
+                slide.setAttribute('aria-hidden', 'true');
+                slide.setAttribute('tabindex', '-1');
+            }
+        });
+        carousel.querySelectorAll('.hero-dot').forEach((dot, i) => {
+            if (i === heroSlide) {
+                dot.setAttribute('aria-current', 'true');
+            } else {
+                dot.removeAttribute('aria-current');
+            }
+        });
+        const caption = carousel.querySelector('.hero-caption-title');
+        caption.textContent = tr(slides[heroSlide].title);
+        caption.setAttribute('href', liveUrl(slides[heroSlide]));
+    }
+
+    function stopHeroTimer() {
+        clearInterval(heroTimer);
+        heroTimer = null;
+    }
+
+    function restartHeroTimer() {
+        stopHeroTimer();
+        // Whoever has asked the system for less motion picks the pictures with the dots
+        if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+            return;
+        }
+        heroTimer = setInterval(() => {
+            if (!app.querySelector('.hero-carousel')) {
+                stopHeroTimer();
+            } else if (!document.hidden) {
+                showHeroSlide(heroSlide + 1);
+            }
+        }, HERO_SLIDE_MS);
     }
 
     function renderHighlights() {
@@ -612,6 +756,9 @@
                 h('a', { class: 'btn btn--primary', href: url, target: '_blank', rel: 'noopener' }, t.openTab, icon('arrow')),
             );
         }
+        if (setupProject(demo)?.kind === 'home3d') {
+            presetHome3dStyle();
+        }
         return [
             h('iframe', { id: 'stage', src: url, title: tr(demo.title), allow: 'fullscreen' }),
             !stageShowing &&
@@ -630,6 +777,22 @@
      * first text is the sign that the view stands. A frame on another origin cannot be asked, there the
      * load event has to do.
      */
+    /**
+     * Whether a page in the frame shows something: text in the page itself, or text inside a web component.
+     * 3D Home draws all its text in the shadow root of <home3d-panel>, there the page itself has no text.
+     */
+    function hasContent(doc) {
+        if (doc.body?.innerText?.trim()) {
+            return true;
+        }
+        for (const el of doc.querySelectorAll('*')) {
+            if (el.shadowRoot?.textContent?.trim()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function watchStage() {
         const frame = document.getElementById('stage');
         if (!frame || frame === watchedFrame || stageShowing) {
@@ -645,7 +808,11 @@
                 return;
             }
             const view = frame.contentDocument;
-            const showing = loaded && (!view || view.body?.innerText?.trim());
+            // the load event may come before this watcher is attached: a finished document counts as loaded
+            if (!loaded && view?.readyState === 'complete' && view.URL !== 'about:blank') {
+                loaded = true;
+            }
+            const showing = loaded && (!view || hasContent(view));
             if (showing || Date.now() - started > STAGE_WAIT_MS) {
                 clearInterval(timer);
                 stageShowing = true;
@@ -654,6 +821,244 @@
                 setTimeout(() => preview?.remove(), STAGE_FADE_MS);
             }
         }, STAGE_POLL_MS);
+    }
+
+    /*
+     * Order of the live view: four groups, inside a group the views with a short name and a symbol for the device they
+     * are made for. Two views with the same short name (e.g. the floor plan for screens and for tablets) are one entry
+     * with a switch. A new vis-2 project lands in the design templates by itself.
+     */
+    const LIVE_GROUPS = [
+        { id: 'plan', match: demo => /grundriss|floor plan|^custom-home3d/i.test(`${demo.id} ${demo.title.de || ''}`) },
+        { id: 'standard', match: demo => /^vis-2-(standard-widgets|glashaus-widgets|jaeger-design-widgets)/.test(demo.id) },
+        { id: 'design', match: demo => demo.type === 'vis-2' },
+        { id: 'more', match: () => true },
+    ];
+
+    /** The order on the page; LIVE_GROUPS is the order in which a view is assigned */
+    const GROUP_ORDER = ['standard', 'design', 'plan', 'more'];
+
+    function groupOf(demo) {
+        return LIVE_GROUPS.find(group => group.match(demo)).id;
+    }
+
+    /** The device a view is made for, from its German title: Handy, Tablet, Bildschirm, otherwise any device */
+    function deviceOf(demo) {
+        const title = demo.title.de || tr(demo.title);
+        if (/\bHandy\b/i.test(title)) return 'phone';
+        if (/\bTablet\b/i.test(title)) return 'tablet';
+        if (/\bBildschirm\b/i.test(title)) return 'screen';
+        return 'any';
+    }
+
+    /** The short name inside its group: the own tab name, otherwise the title without device and group words */
+    function shortName(demo) {
+        const own = tr(demo.tab);
+        if (own) return own;
+        let name = tr(demo.title);
+        if (groupOf(demo) === 'standard' && /^Standard[-\s]widgets(\s+(für|for)\s+|:\s*)./i.test(name)) {
+            // "Standard-Widgets für Handy" is "Handy", "Standard-Widgets: Wetter" is "Wetter"
+            name = name.replace(/^Standard[-\s]widgets(\s+(für|for)\s+|:\s*)/i, '');
+            return name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        return name.replace(/\s+(für|for)\s+(Handy|Tablet|Bildschirm|phones?|tablets?|screens?)$/i, '').replace(/[-\s]widgets$/i, '');
+    }
+
+    function fitsDevice(demo) {
+        const device = deviceOf(demo);
+        return liveDevice === 'all' || device === 'any' || device === liveDevice;
+    }
+
+    /** The entries of one group: views with the same short name are one entry with variants */
+    function groupEntries(groupId) {
+        const entries = [];
+        for (const demo of liveDemos()) {
+            // the open view always stays in the list, also when the device filter would hide it
+            if (groupOf(demo) !== groupId || (!fitsDevice(demo) && demo.id !== currentLiveId)) continue;
+            const name = shortName(demo);
+            const entry = entries.find(item => item.name === name);
+            if (entry) entry.variants.push(demo);
+            else entries.push({ name, variants: [demo] });
+        }
+        return entries;
+    }
+
+    /** All views in the order of the groups, as the arrows on a phone step through them */
+    function orderedDemos() {
+        return GROUP_ORDER.flatMap(id => groupEntries(id).flatMap(entry => entry.variants));
+    }
+
+    function setLiveState(change) {
+        Object.assign(state, change);
+        liveGroup = state.liveGroup;
+        liveDevice = state.liveDevice;
+        pickerOpen = state.pickerOpen;
+        render();
+    }
+    const state = { liveGroup: null, liveDevice: 'all', pickerOpen: false };
+    let currentLiveId = null;
+
+    function deviceFilter(t) {
+        return h(
+            'div',
+            { class: 'live-devices', role: 'group', 'aria-label': t.deviceNav },
+            ['all', 'phone', 'tablet', 'screen'].map(device =>
+                h(
+                    'button',
+                    {
+                        type: 'button',
+                        'aria-pressed': liveDevice === device ? 'true' : 'false',
+                        title: device === 'all' ? t.deviceAll : t.devices[device],
+                        'aria-label': device === 'all' ? t.deviceAll : t.devices[device],
+                        onclick: () => setLiveState({ liveDevice: device }),
+                    },
+                    device === 'all' ? t.deviceAll : icon(device),
+                ),
+            ),
+        );
+    }
+
+    function deviceIcon(demo, t) {
+        const device = deviceOf(demo);
+        const svg = icon(device);
+        return h('span', { class: 'live-device', title: t.devices[device] }, svg);
+    }
+
+    function renderLiveNav(demo, t) {
+        currentLiveId = demo.id;
+        const current = liveGroup || groupOf(demo);
+        const groups = GROUP_ORDER.map(id => ({ id, entries: groupEntries(id) }));
+        const shown = groups.find(group => group.id === current) || groups[0];
+        const order = orderedDemos();
+        const index = order.findIndex(item => item.id === demo.id);
+        const step = delta => {
+            if (!order.length) return;
+            const target = order[(index + delta + order.length) % order.length];
+            setLiveState({ liveGroup: null });
+            navigate(liveUrl(target));
+        };
+        return [
+            // Bildschirm und Tablet: Gruppen, darunter die Visualisierungen der Gruppe
+            h(
+                'div',
+                { class: 'live-groups' },
+                h(
+                    'nav',
+                    { class: 'live-group-list', 'aria-label': t.groupNav },
+                    groups.map(group =>
+                        h(
+                            'button',
+                            {
+                                type: 'button',
+                                'aria-pressed': group.id === shown.id ? 'true' : 'false',
+                                disabled: group.entries.length ? null : '',
+                                onclick: () => setLiveState({ liveGroup: group.id }),
+                            },
+                            t.groups[group.id],
+                            h('small', null, String(group.entries.length)),
+                        ),
+                    ),
+                ),
+                deviceFilter(t),
+            ),
+            h(
+                'nav',
+                { class: 'live-tabs', 'aria-label': t.viewNav },
+                shown.entries.map(entry => {
+                    const active = entry.variants.find(item => item.id === demo.id);
+                    if (entry.variants.length === 1) {
+                        const item = entry.variants[0];
+                        return h(
+                            'button',
+                            { type: 'button', 'aria-pressed': active ? 'true' : 'false', onclick: () => navigate(liveUrl(item)) },
+                            entry.name,
+                            deviceIcon(item, t),
+                        );
+                    }
+                    return h(
+                        'div',
+                        { class: `live-variant${active ? ' is-active' : ''}` },
+                        h(
+                            'button',
+                            {
+                                type: 'button',
+                                class: 'live-variant-name',
+                                'aria-pressed': active ? 'true' : 'false',
+                                onclick: () => navigate(liveUrl(active || entry.variants[0])),
+                            },
+                            entry.name,
+                        ),
+                        h(
+                            'span',
+                            { class: 'live-variant-switch' },
+                            entry.variants.map(item =>
+                                h(
+                                    'button',
+                                    {
+                                        type: 'button',
+                                        'aria-pressed': item.id === demo.id ? 'true' : 'false',
+                                        onclick: () => navigate(liveUrl(item)),
+                                    },
+                                    t.devices[deviceOf(item)] || shortName(item),
+                                ),
+                            ),
+                        ),
+                    );
+                }),
+            ),
+            // Handy: eine Zeile mit Pfeilen, ein Tipp öffnet die ganze Liste
+            h(
+                'div',
+                { class: 'live-picker' },
+                h('button', { type: 'button', class: 'live-step', 'aria-label': t.prevView, onclick: () => step(-1) }, icon('prev')),
+                h(
+                    'button',
+                    { type: 'button', class: 'live-current', 'aria-label': t.pickView, 'aria-expanded': pickerOpen ? 'true' : 'false', onclick: () => setLiveState({ pickerOpen: true }) },
+                    h('span', null, h('small', null, t.groups[groupOf(demo)]), h('b', null, tr(demo.title))),
+                    icon('chevron'),
+                ),
+                h('button', { type: 'button', class: 'live-step', 'aria-label': t.nextView, onclick: () => step(1) }, icon('next')),
+            ),
+            pickerOpen &&
+                h(
+                    'div',
+                    { class: 'live-sheet-wrap', onclick: event => event.target === event.currentTarget && setLiveState({ pickerOpen: false }) },
+                    h(
+                        'div',
+                        { class: 'live-sheet', role: 'dialog', 'aria-label': t.pickView },
+                        h(
+                            'div',
+                            { class: 'live-sheet-head' },
+                            h('span', null, t.deviceNav),
+                            deviceFilter(t),
+                            h('button', { type: 'button', class: 'live-sheet-close', 'aria-label': t.close, onclick: () => setLiveState({ pickerOpen: false }) }, '×'),
+                        ),
+                        groups
+                            .filter(group => group.entries.length)
+                            .map(group => [
+                                h('h4', null, t.groups[group.id]),
+                                group.entries.flatMap(entry =>
+                                    entry.variants.map(item =>
+                                        h(
+                                            'button',
+                                            {
+                                                type: 'button',
+                                                class: 'live-sheet-row',
+                                                'aria-current': item.id === demo.id ? 'true' : null,
+                                                onclick: () => {
+                                                    setLiveState({ pickerOpen: false, liveGroup: null });
+                                                    navigate(liveUrl(item));
+                                                },
+                                            },
+                                            entry.variants.length > 1 ? tr(item.title) : entry.name,
+                                            deviceIcon(item, t),
+                                        ),
+                                    ),
+                                ),
+                            ]),
+                    ),
+                ),
+        ];
     }
 
     function renderLive(demo, t) {
@@ -688,21 +1093,7 @@
                     !download?.url && download?.soon && h('span', { class: 'btn btn-muted' }, icon('download'), t.downloadSoon),
                     languageSwitch(),
                 ),
-                h(
-                    'nav',
-                    { class: 'live-tabs', 'aria-label': t.viewNav },
-                    liveDemos().map(item =>
-                        h(
-                            'button',
-                            {
-                                type: 'button',
-                                'aria-pressed': item.id === demo.id ? 'true' : 'false',
-                                onclick: () => navigate(liveUrl(item)),
-                            },
-                            tr(item.tab) || tr(item.title),
-                        ),
-                    ),
-                ),
+                renderLiveNav(demo, t),
             ),
             h(
                 'main',
@@ -746,7 +1137,8 @@
      * a link to the start page of iobroker.com would only send the visitor away without an answer.
      */
     function renderSideAction(demo) {
-        if (!setupProject(demo)) {
+        // a template marked as coming soon (e.g. its adapter is not released yet) offers no download dialog yet
+        if (!setupProject(demo) || (demo.download?.soon && !demo.download?.url)) {
             return null;
         }
         return h(
@@ -841,6 +1233,19 @@
      * demo-page.0/downloads/<file>.json, the states again in <file>-datenpunkte.json.
      */
     const HOME3D_FILE = '3d-home-familie-mueller';
+    // 3D Home starts in Neon and keeps the visitor's own choice in the browser (localStorage, same origin).
+    // The demo opens in the doll house with furniture, as long as the visitor has chosen nothing yet.
+    const HOME3D_START_STYLE = 'dollhouse';
+
+    function presetHome3dStyle() {
+        try {
+            if (window.localStorage.getItem('home3d.theme') === null) {
+                window.localStorage.setItem('home3d.theme', HOME3D_START_STYLE);
+            }
+        } catch {
+            // without storage 3D Home simply starts in its own style
+        }
+    }
     const SETUP_HOME3D = {
         de: {
             intro: 'So bekommen Sie dieses Haus in Ihr eigenes ioBroker. Sie brauchen dafür zwei Dateien:',
@@ -973,6 +1378,10 @@
     }
 
     let renderedDemoId = null;
+    /** Live view: the group whose views are listed, the device filter and whether the list on a phone is open */
+    let liveGroup = null;
+    let liveDevice = 'all';
+    let pickerOpen = false;
     let rendered = false;
     /** Whether the current live frame shows its view, and the frame that is being watched for it */
     let stageShowing = false;
@@ -998,6 +1407,11 @@
         const t = UI[lang];
         document.documentElement.lang = lang;
         const demo = currentDemo();
+        // a new view starts with its own group; the device filter stays
+        if (demo && renderedDemoId !== demo.id) {
+            state.liveGroup = liveGroup = null;
+            state.pickerOpen = pickerOpen = false;
+        }
         const site = `${config.brand.name}${config.brand.suffix}`;
         document.title = demo ? `${tr(demo.title)}: ${site}` : config.hero ? `${site}: ${tr(config.hero.title)}` : site;
         const description = document.querySelector('meta[name="description"]');
