@@ -405,6 +405,93 @@ p {
     display: block;
     width: 100%;
 }
+/* The hero shows every demo: the pictures fade one into the next, a caption with dots names the one shown */
+.hero-carousel {
+    position: relative;
+}
+.hero-slides {
+    display: grid;
+}
+.hero-slide {
+    grid-area: 1 / 1;
+    display: block;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.6s ease,
+        visibility 0s linear 0.6s;
+}
+.hero-slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.6s ease;
+}
+.hero-slide img {
+    display: block;
+    width: 100%;
+}
+.hero-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 20px;
+    background: linear-gradient(to top, rgba(8, 11, 28, 0.92), rgba(8, 11, 28, 0));
+    pointer-events: none;
+}
+.hero-caption-title {
+    font: 15px var(--display);
+    color: var(--text);
+    text-decoration: none;
+    pointer-events: auto;
+}
+.hero-caption-title:hover {
+    color: var(--accent);
+}
+.hero-dots {
+    display: flex;
+    gap: 2px;
+    pointer-events: auto;
+}
+.hero-dot {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+.hero-dot::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    transition:
+        width 0.3s ease,
+        background 0.3s ease;
+}
+.hero-dot[aria-current]::before {
+    width: 20px;
+    border-radius: 4px;
+    background: var(--accent);
+}
+.hero-dot:focus-visible {
+    outline: 2px solid var(--accent);
+    border-radius: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+    .hero-slide,
+    .hero-slide.is-active {
+        transition: none;
+    }
+}
 .live-pill {
     display: inline-flex;
     align-items: center;
@@ -447,6 +534,10 @@ p {
     .hero-shot {
         grid-column: 6 / span 7;
         grid-row: 2;
+    }
+    .hero-carousel .hero-slides,
+    .hero-carousel .hero-slide {
+        height: 100%;
     }
     /* If the text is the taller one, the picture fills the height instead of ending above the buttons */
     .hero-shot img {
@@ -608,7 +699,8 @@ p {
     max-height: 50vh;
     max-height: 50svh;
     width: 100%;
-    background: var(--bg-deep);
+    /* the same blue as the card below: the cover pictures carry this blue around their window too */
+    background: var(--surface);
 }
 .demo-media:focus-visible {
     outline-offset: -4px;
@@ -1100,3 +1192,304 @@ p {
 .setup-more { display: inline-flex; align-items: center; gap: 10px; margin-top: 18px; color: var(--accent); font-size: 15px; text-decoration: none; }
 .setup-more:hover { text-decoration: underline; }
 @media (max-width: 599px) { .setup-dialog { padding: 20px 18px; } .setup-steps > li { padding-left: 40px; } }
+
+/* ---------- Live view: groups, views of the group, device filter; on a phone one row and a list */
+.live-groups {
+    flex: 1 1 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+    padding-top: 4px;
+}
+.live-group-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.live-group-list button {
+    min-height: 40px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 20px;
+    background: var(--surface);
+    box-shadow: var(--edge);
+    color: var(--text-muted);
+    font: 500 15px var(--body);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+.live-group-list button small {
+    min-width: 22px;
+    padding: 1px 7px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-faint);
+    font-size: 12px;
+}
+.live-group-list button[aria-pressed='true'] {
+    background: var(--accent);
+    color: var(--accent-ink);
+    box-shadow: none;
+}
+.live-group-list button[aria-pressed='true'] small {
+    background: rgba(4, 16, 31, 0.18);
+    color: var(--accent-ink);
+}
+.live-group-list button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+.live-devices {
+    margin-left: auto;
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 10px;
+    background: var(--surface);
+}
+.live-devices button {
+    min-width: 36px;
+    height: 32px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-faint);
+    font: 13px var(--body);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+}
+.live-devices button[aria-pressed='true'] {
+    background: var(--surface-active);
+    color: var(--link-hover);
+}
+/* the views of the chosen group: one row with a line under the open one */
+.live-header .live-tabs {
+    flex: 1 1 100%;
+    order: 0;
+    margin: 0 0 -6px -14px;
+    gap: 2px;
+}
+.live-header .live-tabs > button,
+.live-variant {
+    min-height: 44px;
+    border-radius: 0;
+    border-bottom: 3px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.live-header .live-tabs > button[aria-pressed='true'],
+.live-variant.is-active {
+    background: transparent;
+    border-bottom-color: var(--link-hover);
+}
+.live-device {
+    display: inline-flex;
+    color: var(--text-faint);
+}
+.live-tabs button[aria-pressed='true'] .live-device {
+    color: var(--link-hover);
+}
+.live-variant {
+    padding-right: 6px;
+}
+.live-variant .live-variant-name {
+    padding-right: 4px;
+}
+.live-variant.is-active .live-variant-name {
+    color: var(--link-hover);
+    font-weight: 700;
+}
+.live-variant-switch {
+    display: inline-flex;
+    padding: 2px;
+    border-radius: 8px;
+    background: var(--surface);
+}
+.live-tabs .live-variant-switch button {
+    min-height: 26px;
+    padding: 0 9px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-faint);
+}
+.live-tabs .live-variant-switch button[aria-pressed='true'] {
+    background: var(--surface-active);
+    color: #fff;
+}
+@media (min-width: 1700px) {
+    .live-header .live-tabs {
+        flex-basis: 100%;
+        order: 0;
+        margin-left: -14px;
+    }
+    .live-actions {
+        order: 0;
+    }
+}
+
+/* on a phone: one row with the open view and arrows, a tap opens the list from below */
+.live-picker {
+    display: none;
+}
+@media (max-width: 719px) {
+    .live-groups,
+    .live-header .live-tabs {
+        display: none;
+    }
+    .live-picker {
+        flex: 1 1 100%;
+        display: flex;
+        gap: 8px;
+        padding-bottom: 6px;
+    }
+    .live-step {
+        width: 46px;
+        height: 48px;
+        flex: none;
+        border: 0;
+        border-radius: 12px;
+        background: var(--surface);
+        color: var(--text-muted);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+    }
+    .live-current {
+        flex: 1;
+        min-width: 0;
+        height: 48px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 12px;
+        background: var(--surface);
+        box-shadow: var(--edge-strong);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+        cursor: pointer;
+    }
+    .live-current > span {
+        flex: 1;
+        min-width: 0;
+        line-height: 1.15;
+    }
+    .live-current small {
+        display: block;
+        color: var(--text-faint);
+        font-size: 11px;
+    }
+    .live-current b {
+        display: block;
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .live-current svg {
+        color: var(--text-faint);
+        flex: none;
+    }
+}
+.live-sheet-wrap {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+}
+.live-sheet {
+    width: 100%;
+    max-height: 82vh;
+    overflow-y: auto;
+    padding: 6px 0 24px;
+    border-radius: 22px 22px 0 0;
+    background: #0b1a33;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+}
+.live-sheet-head {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px 10px 18px;
+    background: #0b1a33;
+    color: var(--text-faint);
+    font-size: 13px;
+}
+.live-sheet-head .live-devices {
+    margin-left: auto;
+}
+.live-sheet-close {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+.live-sheet h4 {
+    margin: 14px 18px 4px;
+    color: var(--link);
+    font: 12px var(--display);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.live-sheet-row {
+    width: 100%;
+    min-height: 46px;
+    padding: 0 18px;
+    border: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font: 16px var(--body);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    cursor: pointer;
+}
+.live-sheet-row[aria-current='true'] {
+    background: var(--surface-active);
+    color: #fff;
+    font-weight: 700;
+}
+.live-sheet-row[aria-current='true'] .live-device {
+    color: var(--link-hover);
+}
+
+.live-tabs .live-variant-name[aria-pressed='true'] {
+    background: transparent;
+}
+
+@media (max-width: 1199px) {
+    .live-group-list button {
+        min-height: 36px;
+        padding: 0 12px;
+        font-size: 14px;
+        gap: 6px;
+    }
+    .live-group-list button small {
+        min-width: 18px;
+        padding: 0 5px;
+        font-size: 11px;
+    }
+    .live-devices button {
+        min-width: 32px;
+        height: 30px;
+        padding: 0 6px;
+    }
+}
